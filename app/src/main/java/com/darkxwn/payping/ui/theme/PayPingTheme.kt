@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
@@ -37,6 +38,7 @@ private val PayPingShapes = Shapes(
     extraLarge = RoundedCornerShape(28.dp)
 )
 
+@OptIn(ExperimentalTextApi::class)
 private fun variableFontFamily(resId: Int): FontFamily = FontFamily(
     Font(
         resId = resId,
