@@ -12,6 +12,7 @@ import com.darkxwn.payping.domain.backup.ImportMode
 import com.darkxwn.payping.domain.logic.GroupedReminders
 import com.darkxwn.payping.domain.logic.ReminderPlanner
 import com.darkxwn.payping.domain.logic.ReminderSummary
+import com.darkxwn.payping.domain.model.AppFont
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
@@ -180,6 +181,12 @@ class PayPingViewModel(
     fun removeCustomAccentColor(argb: Long) {
         viewModelScope.launch {
             settingsRepository.removeCustomAccentColor(argb)
+        }
+    }
+
+    fun setAppFont(font: AppFont) {
+        viewModelScope.launch {
+            settingsRepository.setAppFont(font)
         }
     }
 

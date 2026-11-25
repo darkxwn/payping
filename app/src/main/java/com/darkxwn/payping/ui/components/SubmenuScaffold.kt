@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,7 +51,10 @@ fun PayPingSubmenuScreen(
     val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val backgroundColor = MaterialTheme.colorScheme.background
 
-    CompositionLocalProvider(LocalHazeState provides hazeState) {
+    CompositionLocalProvider(
+        LocalHazeState provides hazeState,
+        LocalContentColor provides MaterialTheme.colorScheme.onBackground
+    ) {
         Box(
             modifier = modifier
                 .fillMaxSize()
@@ -77,8 +81,8 @@ fun PayPingSubmenuScreen(
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
-                                backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.78f else 0.96f),
-                                backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.42f else 0.80f),
+                                backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.48f else 0.96f),
+                                backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.16f else 0.78f),
                                 Color.Transparent
                             )
                         )
@@ -105,6 +109,7 @@ fun PayPingSubmenuScreen(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

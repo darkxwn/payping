@@ -51,8 +51,10 @@ private const val LIQUID_GLASS_SHADER_SRC = """
     uniform shader contents;
     uniform float2 resolution;
     uniform float cornerRadius;
+    uniform float bezelWidth;
     uniform float refraction;
     uniform float dispersion;
+    uniform float edgeHighlight;
 
     float sdRoundedBox(float2 p, float2 b, float r) {
         float2 q = abs(p) - b + float2(r);
@@ -64,16 +66,27 @@ private const val LIQUID_GLASS_SHADER_SRC = """
         float safeRadius = min(cornerRadius, min(halfSize.x, halfSize.y));
         float2 p = fragCoord - halfSize;
         float dist = sdRoundedBox(p, halfSize, safeRadius);
-        float edgeDepth = clamp(-dist / max(min(safeRadius, 44.0), 1.0), 0.0, 1.0);
-        float rimFactor = pow(1.0 - edgeDepth, 2.3);
+
+        float bezel = clamp(-dist / max(bezelWidth, 1.0), 0.0, 1.0);
+        float rimCurve = pow(1.0 - bezel, 2.0);
+        float centerFactor = smoothstep(0.0, 1.0, 1.0 - bezel);
+
         float2 dir = p / max(length(p), 0.001);
-        float2 baseCoord = clamp(fragCoord - dir * (rimFactor * refraction), float2(0.0), resolution - float2(1.0));
-        float2 redCoord = clamp(fragCoord - dir * (rimFactor * (refraction + dispersion)), float2(0.0), resolution - float2(1.0));
-        float2 blueCoord = clamp(fragCoord - dir * (rimFactor * max(refraction - dispersion, 0.0)), float2(0.0), resolution - float2(1.0));
+        float2 offset = dir * (rimCurve * refraction + centerFactor * 1.5);
+        float2 baseCoord = clamp(fragCoord - offset, float2(0.0), resolution - float2(1.0));
+        float2 redCoord = clamp(fragCoord - dir * (rimCurve * (refraction + dispersion)), float2(0.0), resolution - float2(1.0));
+        float2 blueCoord = clamp(fragCoord - dir * (rimCurve * max(refraction - dispersion, 0.0)), float2(0.0), resolution - float2(1.0));
+
         half4 center = contents.eval(baseCoord);
         half rCol = contents.eval(redCoord).r;
         half bCol = contents.eval(blueCoord).b;
-        return half4(rCol, center.g, bCol, center.a);
+
+        // Soft directional specular sheen inside the beveled glass edge (top-left brighter, bottom-right dimmer).
+        float lightAngle = clamp((-dir.x * 0.65 - dir.y * 0.75) * 0.5 + 0.5, 0.0, 1.0);
+        float sheen = rimCurve * edgeHighlight * (0.35 + 0.65 * lightAngle);
+
+        half3 lit = clamp(half3(rCol, center.g, bCol) + half3(sheen), half3(0.0), half3(1.0));
+        return half4(lit, center.a);
     }
 """
 
@@ -85,8 +98,9 @@ fun LiquidGlassContainer(
     modifier: Modifier = Modifier,
     hazeState: HazeState? = LocalHazeState.current,
     solidColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    refractionDp: Dp = 11.dp,
-    dispersionDp: Dp = 2.dp,
+    refractionDp: Dp = 18.dp,
+    dispersionDp: Dp = 3.2.dp,
+    bezelWidthDp: Dp = 13.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
     val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
@@ -110,52 +124,65 @@ fun LiquidGlassContainer(
 
     val isMaximum = liquidGlassLevel == LiquidGlassLevel.MAXIMUM
     val tintColor = if (isMaximum) {
-        if (isDark) solidColor.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.24f)
+        if (isDark) solidColor.copy(alpha = 0.08f) else Color.White.copy(alpha = 0.07f)
     } else {
-        if (isDark) solidColor.copy(alpha = 0.58f) else Color.White.copy(alpha = 0.66f)
+        if (isDark) solidColor.copy(alpha = 0.56f) else Color.White.copy(alpha = 0.62f)
     }
     val fallbackColor = if (isMaximum) {
-        if (isDark) solidColor.copy(alpha = 0.72f) else Color.White.copy(alpha = 0.76f)
+        if (isDark) solidColor.copy(alpha = 0.45f) else Color.White.copy(alpha = 0.48f)
     } else {
-        if (isDark) solidColor.copy(alpha = 0.90f) else solidColor.copy(alpha = 0.92f)
+        if (isDark) solidColor.copy(alpha = 0.88f) else solidColor.copy(alpha = 0.90f)
     }
 
     val hazeStyle = HazeStyle(
         backgroundColor = Color.Transparent,
         tints = listOf(HazeTint(tintColor)),
-        blurRadius = if (isMaximum) 24.dp else 20.dp,
-        noiseFactor = if (isMaximum) 0.06f else 0.04f,
+        blurRadius = if (isMaximum) 9.dp else 20.dp,
+        noiseFactor = if (isMaximum) 0.02f else 0.04f,
         fallbackTint = HazeTint(fallbackColor)
     )
 
-    val borderBrush = if (isMaximum) {
+    val outerRimBrush = if (isMaximum) {
         Brush.linearGradient(
             colors = listOf(
-                Color.White.copy(alpha = if (isDark) 0.58f else 0.85f),
-                MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.30f else 0.22f),
-                Color.White.copy(alpha = if (isDark) 0.14f else 0.35f),
-                Color.White.copy(alpha = if (isDark) 0.42f else 0.72f)
+                Color.White.copy(alpha = if (isDark) 0.22f else 0.36f),
+                MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.16f else 0.14f),
+                MaterialTheme.colorScheme.onSurface.copy(alpha = if (isDark) 0.08f else 0.10f),
+                Color.White.copy(alpha = if (isDark) 0.14f else 0.24f)
             )
         )
     } else {
         Brush.linearGradient(
             colors = listOf(
-                Color.White.copy(alpha = if (isDark) 0.24f else 0.65f),
-                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
+                Color.White.copy(alpha = if (isDark) 0.20f else 0.45f),
+                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.38f)
             )
         )
     }
 
+    val innerBevelBrush = Brush.linearGradient(
+        colors = listOf(
+            Color.White.copy(alpha = if (isDark) 0.14f else 0.24f),
+            MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.07f else 0.06f),
+            Color.Transparent,
+            Color.White.copy(alpha = if (isDark) 0.08f else 0.14f)
+        )
+    )
+
     val density = LocalDensity.current
     val cornerRadiusPx = with(density) { cornerRadiusDp.toPx() }
+    val bezelWidthPx = with(density) { bezelWidthDp.toPx() }
     val refractionPx = with(density) { refractionDp.toPx() }
     val dispersionPx = with(density) { dispersionDp.toPx() }
+    val edgeHighlight = if (isDark) 0.14f else 0.20f
 
     val refractionModifier = if (isMaximum && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         Modifier.liquidGlassRefraction(
             cornerRadiusPx = cornerRadiusPx,
+            bezelWidthPx = bezelWidthPx,
             refractionPx = refractionPx,
-            dispersionPx = dispersionPx
+            dispersionPx = dispersionPx,
+            edgeHighlight = edgeHighlight
         )
     } else {
         Modifier
@@ -167,19 +194,23 @@ fun LiquidGlassContainer(
         Modifier.background(fallbackColor)
     }
 
-    val shadowColor = Color.Black.copy(alpha = if (isMaximum) 0.14f else 0.24f)
-
-    Box(
-        modifier = modifier
+    // Never apply Compose shadow() in MAXIMUM mode: shadow draws an opaque-assumption dark fill behind the pill.
+    val containerModifier = if (isMaximum) {
+        modifier.clip(shape)
+    } else {
+        val shadowColor = Color.Black.copy(alpha = 0.22f)
+        modifier
             .shadow(
-                elevation = if (isMaximum) 4.dp else 6.dp,
+                elevation = 5.dp,
                 shape = shape,
                 clip = false,
                 ambientColor = shadowColor,
                 spotColor = shadowColor
             )
             .clip(shape)
-    ) {
+    }
+
+    Box(modifier = containerModifier) {
         Box(
             modifier = Modifier
                 .matchParentSize()
@@ -187,12 +218,23 @@ fun LiquidGlassContainer(
                 .clip(shape)
                 .then(backdropModifier)
         )
+        if (isMaximum) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .border(
+                        width = 3.dp,
+                        brush = innerBevelBrush,
+                        shape = shape
+                    )
+            )
+        }
         Box(
             modifier = Modifier
                 .matchParentSize()
                 .border(
-                    width = if (isMaximum) 1.2.dp else 1.dp,
-                    brush = borderBrush,
+                    width = if (isMaximum) 0.75.dp else 1.dp,
+                    brush = outerRimBrush,
                     shape = shape
                 )
         )
@@ -221,8 +263,9 @@ fun CircularBackButton(
         cornerRadiusDp = 20.dp,
         hazeState = hazeState,
         solidColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        refractionDp = 7.dp,
-        dispersionDp = 1.5.dp,
+        refractionDp = 12.dp,
+        dispersionDp = 2.4.dp,
+        bezelWidthDp = 10.dp,
         modifier = modifier.size(40.dp)
     ) {
         Box(
@@ -246,11 +289,14 @@ fun CircularBackButton(
 @Composable
 private fun Modifier.liquidGlassRefraction(
     cornerRadiusPx: Float,
+    bezelWidthPx: Float,
     refractionPx: Float,
-    dispersionPx: Float
+    dispersionPx: Float,
+    edgeHighlight: Float
 ): Modifier {
     val shader = remember { RuntimeShader(LIQUID_GLASS_SHADER_SRC) }
     var lastSize by remember { mutableStateOf(Size.Zero) }
+    var lastBezel by remember { mutableStateOf(0f) }
     var lastParams by remember { mutableStateOf(Triple(0f, 0f, 0f)) }
     var cachedEffect by remember { mutableStateOf<ComposeRenderEffect?>(null) }
 
@@ -260,13 +306,16 @@ private fun Modifier.liquidGlassRefraction(
             return@graphicsLayer
         }
         val currentParams = Triple(cornerRadiusPx, refractionPx, dispersionPx)
-        if (cachedEffect == null || size != lastSize || currentParams != lastParams) {
+        if (cachedEffect == null || size != lastSize || currentParams != lastParams || bezelWidthPx != lastBezel) {
             shader.setFloatUniform("resolution", size.width, size.height)
             shader.setFloatUniform("cornerRadius", cornerRadiusPx)
+            shader.setFloatUniform("bezelWidth", bezelWidthPx)
             shader.setFloatUniform("refraction", refractionPx)
             shader.setFloatUniform("dispersion", dispersionPx)
+            shader.setFloatUniform("edgeHighlight", edgeHighlight)
             cachedEffect = RenderEffect.createRuntimeShaderEffect(shader, "contents").asComposeRenderEffect()
             lastSize = size
+            lastBezel = bezelWidthPx
             lastParams = currentParams
         }
         renderEffect = cachedEffect

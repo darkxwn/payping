@@ -93,6 +93,11 @@
     <string name="theme_black_pure">Pure black</string>
     <string name="theme_section_color">Theme color</string>
     <string name="theme_color_material_you">Material You</string>
+    <string name="theme_section_font">Font</string>
+    <string name="font_system">Default</string>
+    <string name="font_roboto">Roboto</string>
+    <string name="font_inter">Inter</string>
+    <string name="font_consolas">Consolas</string>
     <string name="color_picker_title">Custom color</string>
     <string name="color_picker_hex_label">HEX color</string>
     <string name="color_picker_add">Add</string>

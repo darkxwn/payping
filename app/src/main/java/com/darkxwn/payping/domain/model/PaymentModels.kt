@@ -28,6 +28,13 @@ enum class LiquidGlassLevel {
     MAXIMUM
 }
 
+enum class AppFont {
+    SYSTEM,
+    ROBOTO,
+    INTER,
+    CONSOLAS
+}
+
 enum class BaseAccentColor(val argb: Long) {
     EMERALD(0xFF0E7C66L),
     OCEAN(0xFF1565C0L),
@@ -134,6 +141,7 @@ data class AppSettings(
     val useDynamicColor: Boolean = false,
     val accentColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
     val customAccentColors: List<Long> = emptyList(),
+    val appFont: AppFont = AppFont.SYSTEM,
     val bottomBarStyle: BottomBarStyle = BottomBarStyle.PINNED,
     val liquidGlassLevel: LiquidGlassLevel = LiquidGlassLevel.NONE,
     val defaultCurrencyCode: String = CurrencyOption.RUB.code

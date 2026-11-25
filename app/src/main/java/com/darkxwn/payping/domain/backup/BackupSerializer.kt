@@ -1,5 +1,6 @@
 package com.darkxwn.payping.domain.backup
 
+import com.darkxwn.payping.domain.model.AppFont
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
@@ -37,6 +38,7 @@ data class BackupSettingsDto(
     val useDynamicColor: Boolean = false,
     val accentColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
     val customAccentColors: List<Long> = emptyList(),
+    val appFont: String? = null,
     val bottomBarStyle: String? = null,
     val liquidGlassLevel: String? = null,
     val defaultCurrencyCode: String? = null
@@ -101,6 +103,7 @@ object BackupSerializer {
                 useDynamicColor = settings.useDynamicColor,
                 accentColorArgb = BaseAccentColor.normalizeOpaqueArgb(settings.accentColorArgb),
                 customAccentColors = settings.customAccentColors.map(BaseAccentColor::normalizeOpaqueArgb),
+                appFont = settings.appFont.name,
                 bottomBarStyle = settings.bottomBarStyle.name,
                 liquidGlassLevel = settings.liquidGlassLevel.name,
                 defaultCurrencyCode = settings.defaultCurrencyCode
@@ -153,6 +156,7 @@ object BackupSerializer {
                 customAccentColors = dto.customAccentColors
                     .map(BaseAccentColor::normalizeOpaqueArgb)
                     .distinct(),
+                appFont = enumValueOrNull<AppFont>(dto.appFont) ?: AppFont.SYSTEM,
                 bottomBarStyle = enumValueOrNull<BottomBarStyle>(dto.bottomBarStyle) ?: BottomBarStyle.PINNED,
                 liquidGlassLevel = enumValueOrNull<LiquidGlassLevel>(dto.liquidGlassLevel) ?: LiquidGlassLevel.NONE,
                 defaultCurrencyCode = CurrencyOption.fromCode(dto.defaultCurrencyCode).code

@@ -344,6 +344,7 @@ fun PayPingAppScreen(
                                     onSelectDynamicColor = { viewModel.selectDynamicColor() },
                                     onAddCustomAccentColor = { viewModel.addCustomAccentColor(it) },
                                     onRemoveCustomAccentColor = { viewModel.removeCustomAccentColor(it) },
+                                    onAppFontChange = { viewModel.setAppFont(it) },
                                     onBottomBarStyleChange = { viewModel.setBottomBarStyle(it) },
                                     onLiquidGlassLevelChange = { viewModel.setLiquidGlassLevel(it) },
                                     onNavigateBack = { navController.popBackStack() }
@@ -480,8 +481,8 @@ private fun FloatingLiquidBottomBar(
     val pillShape = RoundedCornerShape(28.dp)
     val activeIndicatorAlpha = when (liquidGlassLevel) {
         LiquidGlassLevel.NONE -> 1f
-        LiquidGlassLevel.STANDARD -> 0.82f
-        LiquidGlassLevel.MAXIMUM -> 0.56f
+        LiquidGlassLevel.STANDARD -> 0.72f
+        LiquidGlassLevel.MAXIMUM -> 0.30f
     }
 
     LiquidGlassContainer(

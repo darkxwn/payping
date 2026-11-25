@@ -9,19 +9,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.TextFields
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
@@ -45,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.darkxwn.payping.R
+import com.darkxwn.payping.domain.model.AppFont
 import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
 import com.darkxwn.payping.domain.model.BaseAccentColor
@@ -52,6 +59,7 @@ import com.darkxwn.payping.domain.model.BottomBarStyle
 import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import com.darkxwn.payping.ui.components.ColorPickerDialog
 import com.darkxwn.payping.ui.components.PayPingSubmenuScreen
+import com.darkxwn.payping.ui.theme.fontFamilyFor
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -63,12 +71,14 @@ fun ThemeSettingsScreen(
     onSelectDynamicColor: () -> Unit,
     onAddCustomAccentColor: (Long) -> Unit,
     onRemoveCustomAccentColor: (Long) -> Unit,
+    onAppFontChange: (AppFont) -> Unit,
     onBottomBarStyleChange: (BottomBarStyle) -> Unit,
     onLiquidGlassLevelChange: (LiquidGlassLevel) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showColorPicker by remember { mutableStateOf(false) }
+    var fontMenuExpanded by remember { mutableStateOf(false) }
 
     PayPingSubmenuScreen(
         title = stringResource(R.string.settings_theme_screen_title),
@@ -168,6 +178,87 @@ fun ThemeSettingsScreen(
                     }
 
                     AddAccentSwatchButton(onClick = { showColorPicker = true })
+                }
+            }
+
+            ExternalSectionTitle(stringResource(R.string.theme_section_font))
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                )
+            ) {
+                val activeFontLabel = when (settings.appFont) {
+                    AppFont.SYSTEM -> stringResource(R.string.font_system)
+                    AppFont.ROBOTO -> stringResource(R.string.font_roboto)
+                    AppFont.INTER -> stringResource(R.string.font_inter)
+                    AppFont.CONSOLAS -> stringResource(R.string.font_consolas)
+                }
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(role = Role.DropdownList) {
+                                fontMenuExpanded = true
+                            }
+                            .padding(horizontal = 16.dp, vertical = 15.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.TextFields,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(14.dp))
+                        Text(
+                            text = activeFontLabel,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = fontMenuExpanded,
+                        onDismissRequest = { fontMenuExpanded = false }
+                    ) {
+                        val fontOptions = listOf(
+                            AppFont.SYSTEM to R.string.font_system,
+                            AppFont.ROBOTO to R.string.font_roboto,
+                            AppFont.INTER to R.string.font_inter,
+                            AppFont.CONSOLAS to R.string.font_consolas
+                        )
+                        fontOptions.forEach { (option, labelRes) ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = stringResource(labelRes),
+                                        fontFamily = fontFamilyFor(option)
+                                    )
+                                },
+                                trailingIcon = if (settings.appFont == option) {
+                                    {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Check,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                } else {
+                                    null
+                                },
+                                onClick = {
+                                    fontMenuExpanded = false
+                                    onAppFontChange(option)
+                                }
+                            )
+                        }
+                    }
                 }
             }
 

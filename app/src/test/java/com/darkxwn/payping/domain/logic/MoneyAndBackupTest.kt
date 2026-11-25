@@ -1,6 +1,7 @@
 package com.darkxwn.payping.domain.logic
 
 import com.darkxwn.payping.domain.backup.BackupSerializer
+import com.darkxwn.payping.domain.model.AppFont
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
@@ -71,6 +72,7 @@ class MoneyAndBackupTest {
             useDynamicColor = false,
             accentColorArgb = 0xFF4F46E5L,
             customAccentColors = listOf(0xFF4F46E5L, 0xFF00BCD4L),
+            appFont = AppFont.CONSOLAS,
             bottomBarStyle = BottomBarStyle.FLOATING,
             liquidGlassLevel = LiquidGlassLevel.MAXIMUM,
             defaultCurrencyCode = "EUR"
@@ -113,6 +115,7 @@ class MoneyAndBackupTest {
         assertFalse(settings.useDynamicColor)
         assertEquals(BaseAccentColor.DEFAULT_ARGB, settings.accentColorArgb)
         assertTrue(settings.customAccentColors.isEmpty())
+        assertEquals(AppFont.SYSTEM, settings.appFont)
         assertEquals(BottomBarStyle.PINNED, settings.bottomBarStyle)
         assertEquals(LiquidGlassLevel.NONE, settings.liquidGlassLevel)
     }
@@ -130,6 +133,7 @@ class MoneyAndBackupTest {
         assertEquals(0xFF4F46E5L, BaseAccentColor.parseHex("4F46E5"))
         assertNull(BaseAccentColor.parseHex("bad"))
         assertEquals("#4F46E5", BaseAccentColor.formatHex(0x124F46E5L))
+        assertEquals(AppFont.INTER, AppFont.valueOf("INTER"))
     }
 
     @Test

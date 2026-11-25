@@ -54,7 +54,8 @@ class MainActivity : AppCompatActivity() {
                 themeMode = settings.themeMode,
                 pureBlack = settings.pureBlack,
                 useDynamicColor = settings.useDynamicColor,
-                accentColorArgb = settings.accentColorArgb
+                accentColorArgb = settings.accentColorArgb,
+                appFont = settings.appFont
             ) {
                 PayPingAppScreen(
                     viewModel = viewModel,

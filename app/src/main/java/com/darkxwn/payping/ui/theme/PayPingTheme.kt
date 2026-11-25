@@ -2,20 +2,96 @@ package com.darkxwn.payping.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
+import com.darkxwn.payping.R
+import com.darkxwn.payping.domain.model.AppFont
 import com.darkxwn.payping.domain.model.AppThemeMode
 import com.darkxwn.payping.domain.model.BaseAccentColor
+
+private val PayPingShapes = Shapes(
+    extraSmall = RoundedCornerShape(12.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(22.dp),
+    large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(28.dp)
+)
+
+private fun variableFontFamily(resId: Int): FontFamily = FontFamily(
+    Font(
+        resId = resId,
+        weight = FontWeight.Normal,
+        variationSettings = FontVariation.Settings(FontVariation.weight(400))
+    ),
+    Font(
+        resId = resId,
+        weight = FontWeight.Medium,
+        variationSettings = FontVariation.Settings(FontVariation.weight(500))
+    ),
+    Font(
+        resId = resId,
+        weight = FontWeight.SemiBold,
+        variationSettings = FontVariation.Settings(FontVariation.weight(600))
+    ),
+    Font(
+        resId = resId,
+        weight = FontWeight.Bold,
+        variationSettings = FontVariation.Settings(FontVariation.weight(700))
+    )
+)
+
+private val RobotoFontFamily = variableFontFamily(R.font.roboto_variable)
+private val InterFontFamily = variableFontFamily(R.font.inter_variable)
+private val ConsolasFontFamily = variableFontFamily(R.font.inconsolata_lgc_variable)
+
+fun fontFamilyFor(appFont: AppFont): FontFamily = when (appFont) {
+    AppFont.SYSTEM -> FontFamily.Default
+    AppFont.ROBOTO -> RobotoFontFamily
+    AppFont.INTER -> InterFontFamily
+    AppFont.CONSOLAS -> ConsolasFontFamily
+}
+
+private fun buildTypography(fontFamily: FontFamily): Typography {
+    if (fontFamily == FontFamily.Default) return Typography()
+    val base = Typography()
+    return Typography(
+        displayLarge = base.displayLarge.copy(fontFamily = fontFamily),
+        displayMedium = base.displayMedium.copy(fontFamily = fontFamily),
+        displaySmall = base.displaySmall.copy(fontFamily = fontFamily),
+        headlineLarge = base.headlineLarge.copy(fontFamily = fontFamily),
+        headlineMedium = base.headlineMedium.copy(fontFamily = fontFamily),
+        headlineSmall = base.headlineSmall.copy(fontFamily = fontFamily),
+        titleLarge = base.titleLarge.copy(fontFamily = fontFamily),
+        titleMedium = base.titleMedium.copy(fontFamily = fontFamily),
+        titleSmall = base.titleSmall.copy(fontFamily = fontFamily),
+        bodyLarge = base.bodyLarge.copy(fontFamily = fontFamily),
+        bodyMedium = base.bodyMedium.copy(fontFamily = fontFamily),
+        bodySmall = base.bodySmall.copy(fontFamily = fontFamily),
+        labelLarge = base.labelLarge.copy(fontFamily = fontFamily),
+        labelMedium = base.labelMedium.copy(fontFamily = fontFamily),
+        labelSmall = base.labelSmall.copy(fontFamily = fontFamily)
+    )
+}
 
 private val DefaultLightColors = lightColorScheme(
     primary = Color(0xFF0E7C66),
@@ -90,6 +166,7 @@ fun PayPingTheme(
     pureBlack: Boolean = false,
     useDynamicColor: Boolean = false,
     accentColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
+    appFont: AppFont = AppFont.SYSTEM,
     content: @Composable () -> Unit
 ) {
     val useDark = isPayPingDarkTheme(themeMode)
@@ -109,10 +186,19 @@ fun PayPingTheme(
         baseScheme
     }
 
+    val typography = remember(appFont) {
+        buildTypography(fontFamilyFor(appFont))
+    }
+
     MaterialTheme(
         colorScheme = colorScheme,
-        content = content
-    )
+        typography = typography,
+        shapes = PayPingShapes
+    ) {
+        CompositionLocalProvider(LocalContentColor provides colorScheme.onBackground) {
+            content()
+        }
+    }
 }
 
 private fun ColorScheme.withPureBlackSurfaces(): ColorScheme = copy(

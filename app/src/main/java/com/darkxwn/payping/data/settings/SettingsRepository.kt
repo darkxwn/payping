@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.darkxwn.payping.domain.model.AppFont
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
@@ -30,6 +31,7 @@ class SettingsRepository(private val context: Context) {
         val USE_DYNAMIC_COLOR = booleanPreferencesKey("use_dynamic_color")
         val ACCENT_COLOR_ARGB = longPreferencesKey("accent_color_argb")
         val CUSTOM_ACCENT_COLORS = stringPreferencesKey("custom_accent_colors")
+        val APP_FONT = stringPreferencesKey("app_font")
         val BOTTOM_BAR_STYLE = stringPreferencesKey("bottom_bar_style")
         val LIQUID_GLASS_LEVEL = stringPreferencesKey("liquid_glass_level")
         val DEFAULT_CURRENCY = stringPreferencesKey("default_currency")
@@ -43,6 +45,7 @@ class SettingsRepository(private val context: Context) {
         val accentColorArgb = prefs[Keys.ACCENT_COLOR_ARGB]?.let(BaseAccentColor::normalizeOpaqueArgb)
             ?: BaseAccentColor.DEFAULT_ARGB
         val customColors = decodeCustomColors(prefs[Keys.CUSTOM_ACCENT_COLORS])
+        val appFont = enumOrDefault(prefs[Keys.APP_FONT], AppFont.SYSTEM)
         val bottomBarStyle = enumOrDefault(prefs[Keys.BOTTOM_BAR_STYLE], BottomBarStyle.PINNED)
         val liquidGlassLevel = enumOrDefault(prefs[Keys.LIQUID_GLASS_LEVEL], LiquidGlassLevel.NONE)
         val currency = CurrencyOption.fromCode(prefs[Keys.DEFAULT_CURRENCY]).code
@@ -54,6 +57,7 @@ class SettingsRepository(private val context: Context) {
             useDynamicColor = useDynamicColor,
             accentColorArgb = accentColorArgb,
             customAccentColors = customColors,
+            appFont = appFont,
             bottomBarStyle = bottomBarStyle,
             liquidGlassLevel = liquidGlassLevel,
             defaultCurrencyCode = currency
@@ -118,6 +122,12 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    suspend fun setAppFont(font: AppFont) {
+        context.settingsDataStore.edit { prefs ->
+            prefs[Keys.APP_FONT] = font.name
+        }
+    }
+
     suspend fun setBottomBarStyle(style: BottomBarStyle) {
         context.settingsDataStore.edit { prefs ->
             prefs[Keys.BOTTOM_BAR_STYLE] = style.name
@@ -147,6 +157,7 @@ class SettingsRepository(private val context: Context) {
             prefs[Keys.CUSTOM_ACCENT_COLORS] = encodeCustomColors(
                 imported.customAccentColors.map(BaseAccentColor::normalizeOpaqueArgb).distinct()
             )
+            prefs[Keys.APP_FONT] = imported.appFont.name
             prefs[Keys.BOTTOM_BAR_STYLE] = imported.bottomBarStyle.name
             prefs[Keys.LIQUID_GLASS_LEVEL] = imported.liquidGlassLevel.name
             prefs[Keys.DEFAULT_CURRENCY] = CurrencyOption.fromCode(imported.defaultCurrencyCode).code
