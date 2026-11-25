@@ -1,0 +1,120 @@
+<resources>
+    <string name="app_name">PayPing</string>
+
+    <!-- Navigation -->
+    <string name="nav_reminders">Payments</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Reminders Screen -->
+    <string name="summary_next_7_days">Next 7 days</string>
+    <string name="summary_end_of_month">End of month</string>
+    <string name="summary_includes_overdue">Includes overdue: %1$d</string>
+    <string name="bucket_overdue">Overdue</string>
+    <string name="bucket_today">Today</string>
+    <string name="bucket_upcoming">Upcoming</string>
+    <string name="bucket_later">Later</string>
+    <string name="action_mark_done">Done</string>
+    <string name="action_add_reminder">Add payment</string>
+    <string name="empty_reminders_title">No upcoming payments yet</string>
+    <string name="empty_reminders_subtitle">Add subscriptions, rent, loans, or taxes so PayPing reminds you in advance to top up your account.</string>
+    <string name="banner_notifications_disabled_title">Notifications are turned off</string>
+    <string name="banner_notifications_disabled_body">Allow notifications so PayPing can alert you before scheduled charges.</string>
+    <string name="action_allow">Allow</string>
+    <string name="action_open_settings">Settings</string>
+    <string name="snackbar_marked_done_once">%1$s moved to history</string>
+    <string name="snackbar_marked_done_recurring">%1$s marked done • next: %2$s</string>
+
+    <!-- Recurrence -->
+    <string name="recurrence_once">One-time</string>
+    <string name="recurrence_weekly">Weekly</string>
+    <string name="recurrence_monthly">Monthly</string>
+    <string name="recurrence_yearly">Yearly</string>
+
+    <!-- Remind days -->
+    <string name="remind_day_0">On due day</string>
+    <string name="remind_day_n">%1$d d before</string>
+    <string name="remind_chip_0">Due day</string>
+    <string name="remind_chip_n">-%1$dd</string>
+
+    <!-- Editor Screen -->
+    <string name="editor_title_new">New payment</string>
+    <string name="editor_title_edit">Edit payment</string>
+    <string name="field_title_label">Title</string>
+    <string name="field_title_placeholder">e.g. Rent, Mobile plan, Subscription</string>
+    <string name="field_amount_label">Amount</string>
+    <string name="field_amount_placeholder">0.00</string>
+    <string name="field_currency_label">Currency</string>
+    <string name="field_due_date_label">Due date</string>
+    <string name="field_notify_time_label">Notification time</string>
+    <string name="field_recurrence_label">Repeat</string>
+    <string name="field_remind_before_label">Remind in advance</string>
+    <string name="field_note_label">Note (optional)</string>
+    <string name="field_note_placeholder">Card or account name</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="error_title_required">Enter a payment title</string>
+    <string name="error_amount_invalid">Enter a valid amount greater than 0</string>
+    <string name="error_remind_days_required">Select at least one reminder offset</string>
+    <string name="dialog_delete_reminder_title">Delete payment?</string>
+    <string name="dialog_delete_reminder_body">This will remove "%1$s" and cancel its scheduled notifications.</string>
+    <string name="dialog_select_time_title">Notification time</string>
+    <string name="action_confirm">Confirm</string>
+
+    <!-- History Screen -->
+    <string name="empty_history_title">Payment history is empty</string>
+    <string name="empty_history_subtitle">Payments marked as Done will appear here with the exact confirmation date.</string>
+    <string name="history_due_date">Scheduled: %1$s</string>
+    <string name="history_paid_at">Paid: %1$s</string>
+    <string name="action_clear_history">Clear history</string>
+    <string name="dialog_clear_history_title">Clear all history?</string>
+    <string name="dialog_clear_history_body">All saved confirmation records will be permanently removed.</string>
+    <string name="dialog_delete_history_item_title">Delete history record?</string>
+    <string name="dialog_delete_history_item_body">Remove "%1$s" from payment history?</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_section_general">General</string>
+    <string name="settings_language">Language</string>
+    <string name="language_ru">Русский</string>
+    <string name="language_en">English</string>
+    <string name="settings_theme">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="settings_default_currency">Default currency</string>
+
+    <string name="settings_section_notifications">Notifications &amp; Alarms</string>
+    <string name="settings_notifications_permission">Notifications permission</string>
+    <string name="settings_exact_alarms">Exact schedule alarms</string>
+    <string name="status_granted">Enabled</string>
+    <string name="status_not_granted">Disabled</string>
+    <string name="status_exact_fallback">Approximate (enable for exact minute delivery)</string>
+    <string name="action_grant">Enable</string>
+
+    <string name="settings_section_backup">Backup (JSON)</string>
+    <string name="settings_export_json">Export to JSON</string>
+    <string name="settings_export_desc">Save reminders, history, and preferences to a file</string>
+    <string name="settings_import_json">Import from JSON</string>
+    <string name="settings_import_desc">Restore from a backup file</string>
+    <string name="dialog_import_mode_title">How should backup be imported?</string>
+    <string name="dialog_import_mode_body">Replace clears current payments and history before importing. Merge keeps existing items and adds entries from the file.</string>
+    <string name="action_import_replace">Replace</string>
+    <string name="action_import_merge">Merge</string>
+    <string name="snackbar_export_success">Backup saved</string>
+    <string name="snackbar_export_error">Failed to save backup</string>
+    <string name="snackbar_import_success">Imported: %1$d payments, %2$d history records</string>
+    <string name="snackbar_import_error">Invalid backup file</string>
+
+    <string name="settings_section_about">About</string>
+    <string name="settings_about_text">PayPing %1$s • Local-only offline storage • GPLv3</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Payment reminders</string>
+    <string name="notification_channel_desc">Scheduled reminders before upcoming charges</string>
+    <string name="notification_title_today">Due today: %1$s</string>
+    <string name="notification_title_tomorrow">Due tomorrow: %1$s</string>
+    <string name="notification_title_in_days">In %1$d days: %2$s</string>
+    <string name="notification_body_amount">Amount: %1$s</string>
+    <string name="notification_body_with_note">Amount: %1$s • %2$s</string>
+</resources>

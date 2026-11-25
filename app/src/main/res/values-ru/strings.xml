@@ -1,0 +1,120 @@
+<resources>
+    <string name="app_name">PayPing</string>
+
+    <!-- Navigation -->
+    <string name="nav_reminders">Списания</string>
+    <string name="nav_history">История</string>
+    <string name="nav_settings">Настройки</string>
+
+    <!-- Reminders Screen -->
+    <string name="summary_next_7_days">Ближайшие 7 дней</string>
+    <string name="summary_end_of_month">До конца месяца</string>
+    <string name="summary_includes_overdue">Включая просрочено: %1$d</string>
+    <string name="bucket_overdue">Просрочено</string>
+    <string name="bucket_today">Сегодня</string>
+    <string name="bucket_upcoming">Ближайшие</string>
+    <string name="bucket_later">Позже</string>
+    <string name="action_mark_done">Готово</string>
+    <string name="action_add_reminder">Добавить списание</string>
+    <string name="empty_reminders_title">Пока нет списаний</string>
+    <string name="empty_reminders_subtitle">Добавьте подписки, аренду, кредиты или налоги — PayPing заранее напомнит пополнить счёт.</string>
+    <string name="banner_notifications_disabled_title">Уведомления отключены</string>
+    <string name="banner_notifications_disabled_body">Разрешите уведомления, чтобы приложение вовремя напоминало о списаниях.</string>
+    <string name="action_allow">Разрешить</string>
+    <string name="action_open_settings">Настройки</string>
+    <string name="snackbar_marked_done_once">%1$s перенесено в историю</string>
+    <string name="snackbar_marked_done_recurring">%1$s отмечено • след.: %2$s</string>
+
+    <!-- Recurrence -->
+    <string name="recurrence_once">Разово</string>
+    <string name="recurrence_weekly">Еженедельно</string>
+    <string name="recurrence_monthly">Ежемесячно</string>
+    <string name="recurrence_yearly">Ежегодно</string>
+
+    <!-- Remind days -->
+    <string name="remind_day_0">В день списания</string>
+    <string name="remind_day_n">За %1$d дн.</string>
+    <string name="remind_chip_0">В день</string>
+    <string name="remind_chip_n">-%1$d д.</string>
+
+    <!-- Editor Screen -->
+    <string name="editor_title_new">Новое списание</string>
+    <string name="editor_title_edit">Редактировать</string>
+    <string name="field_title_label">Название</string>
+    <string name="field_title_placeholder">Например: Аренда, Связь, Подписка</string>
+    <string name="field_amount_label">Сумма</string>
+    <string name="field_amount_placeholder">0.00</string>
+    <string name="field_currency_label">Валюта</string>
+    <string name="field_due_date_label">Дата списания</string>
+    <string name="field_notify_time_label">Время уведомления</string>
+    <string name="field_recurrence_label">Повторяемость</string>
+    <string name="field_remind_before_label">Напомнить заранее</string>
+    <string name="field_note_label">Заметка (необязательно)</string>
+    <string name="field_note_placeholder">Название карты или счёта</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_delete">Удалить</string>
+    <string name="error_title_required">Введите название списания</string>
+    <string name="error_amount_invalid">Введите корректную сумму больше 0</string>
+    <string name="error_remind_days_required">Выберите хотя бы один срок напоминания</string>
+    <string name="dialog_delete_reminder_title">Удалить списание?</string>
+    <string name="dialog_delete_reminder_body">Списание «%1$s» и его запланированные уведомления будут удалены.</string>
+    <string name="dialog_select_time_title">Время напоминания</string>
+    <string name="action_confirm">Подтвердить</string>
+
+    <!-- History Screen -->
+    <string name="empty_history_title">История платежей пуста</string>
+    <string name="empty_history_subtitle">Все списания, отмеченные кнопкой «Готово», будут сохраняться здесь с датой подтверждения.</string>
+    <string name="history_due_date">По плану: %1$s</string>
+    <string name="history_paid_at">Оплачено: %1$s</string>
+    <string name="action_clear_history">Очистить историю</string>
+    <string name="dialog_clear_history_title">Очистить всю историю?</string>
+    <string name="dialog_clear_history_body">Все записи о прошлых оплатах будут удалены безвозвратно.</string>
+    <string name="dialog_delete_history_item_title">Удалить запись из истории?</string>
+    <string name="dialog_delete_history_item_body">Удалить «%1$s» из истории платежей?</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_section_general">Основные</string>
+    <string name="settings_language">Язык</string>
+    <string name="language_ru">Русский</string>
+    <string name="language_en">English</string>
+    <string name="settings_theme">Тема оформления</string>
+    <string name="theme_system">Системная</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="settings_default_currency">Валюта по умолчанию</string>
+
+    <string name="settings_section_notifications">Уведомления и будильники</string>
+    <string name="settings_notifications_permission">Разрешение на уведомления</string>
+    <string name="settings_exact_alarms">Точное время срабатывания</string>
+    <string name="status_granted">Включено</string>
+    <string name="status_not_granted">Отключено</string>
+    <string name="status_exact_fallback">Приблизительно (включите для точности до минуты)</string>
+    <string name="action_grant">Включить</string>
+
+    <string name="settings_section_backup">Резервная копия (JSON)</string>
+    <string name="settings_export_json">Экспорт в JSON</string>
+    <string name="settings_export_desc">Сохранить списания, историю и настройки в файл</string>
+    <string name="settings_import_json">Импорт из JSON</string>
+    <string name="settings_import_desc">Восстановить данные из файла</string>
+    <string name="dialog_import_mode_title">Как импортировать копию?</string>
+    <string name="dialog_import_mode_body">«Заменить» удалит текущие списания и историю перед загрузкой. «Объединить» добавит записи к существующим.</string>
+    <string name="action_import_replace">Заменить</string>
+    <string name="action_import_merge">Объединить</string>
+    <string name="snackbar_export_success">Резервная копия сохранена</string>
+    <string name="snackbar_export_error">Не удалось сохранить копию</string>
+    <string name="snackbar_import_success">Импортировано: %1$d списаний, %2$d в истории</string>
+    <string name="snackbar_import_error">Некорректный файл резервной копии</string>
+
+    <string name="settings_section_about">О приложении</string>
+    <string name="settings_about_text">PayPing %1$s • Локальное хранение без сервера • GPLv3</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Напоминания о списаниях</string>
+    <string name="notification_channel_desc">Запланированные уведомления перед датой списания</string>
+    <string name="notification_title_today">Сегодня списание: %1$s</string>
+    <string name="notification_title_tomorrow">Завтра списание: %1$s</string>
+    <string name="notification_title_in_days">Через %1$d дн.: %2$s</string>
+    <string name="notification_body_amount">Сумма: %1$s</string>
+    <string name="notification_body_with_note">Сумма: %1$s • %2$s</string>
+</resources>
