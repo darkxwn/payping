@@ -15,6 +15,15 @@ class RecurrenceCalculatorTest {
     }
 
     @Test
+    fun daily_addsOneDay() {
+        val date = LocalDate.of(2026, 2, 28)
+        assertEquals(
+            LocalDate.of(2026, 3, 1),
+            RecurrenceCalculator.nextDueDate(date, RecurrenceType.DAILY)
+        )
+    }
+
+    @Test
     fun weekly_addsSevenDays() {
         val date = LocalDate.of(2026, 3, 28)
         assertEquals(

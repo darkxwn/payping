@@ -27,6 +27,7 @@
 
     <!-- Recurrence -->
     <string name="recurrence_once">Разово</string>
+    <string name="recurrence_daily">Ежедневно</string>
     <string name="recurrence_weekly">Еженедельно</string>
     <string name="recurrence_monthly">Ежемесячно</string>
     <string name="recurrence_yearly">Ежегодно</string>

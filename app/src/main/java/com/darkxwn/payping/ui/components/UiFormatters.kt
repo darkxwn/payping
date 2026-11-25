@@ -15,6 +15,7 @@ import java.util.Locale
 @Composable
 fun recurrenceLabel(recurrence: RecurrenceType): String = when (recurrence) {
     RecurrenceType.ONCE -> stringResource(R.string.recurrence_once)
+    RecurrenceType.DAILY -> stringResource(R.string.recurrence_daily)
     RecurrenceType.WEEKLY -> stringResource(R.string.recurrence_weekly)
     RecurrenceType.MONTHLY -> stringResource(R.string.recurrence_monthly)
     RecurrenceType.YEARLY -> stringResource(R.string.recurrence_yearly)

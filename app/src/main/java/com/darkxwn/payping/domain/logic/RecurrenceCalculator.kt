@@ -18,6 +18,7 @@ object RecurrenceCalculator {
         val safeAnchor = anchorDayOfMonth.coerceIn(1, 31)
         return when (recurrence) {
             RecurrenceType.ONCE -> null
+            RecurrenceType.DAILY -> currentDueDate.plusDays(1)
             RecurrenceType.WEEKLY -> currentDueDate.plusWeeks(1)
             RecurrenceType.MONTHLY -> {
                 val targetMonth = YearMonth.from(currentDueDate).plusMonths(1)

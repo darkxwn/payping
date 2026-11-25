@@ -5,6 +5,7 @@ import java.util.Locale
 
 enum class RecurrenceType {
     ONCE,
+    DAILY,
     WEEKLY,
     MONTHLY,
     YEARLY

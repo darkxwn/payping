@@ -1,13 +1,9 @@
-# Keep PayPing model and serialization classes intact if minify is enabled later
+# Preserve annotations and inner classes for serialization and Room under R8 Full Mode
 -keepattributes *Annotation*,InnerClasses
 -dontnote kotlinx.serialization.**
--keepclassmembers class kotlinx.serialization.json.** {
-    *** Companion;
-}
--keepclasseswithmembers class kotlinx.serialization.json.** {
-    kotlinx.serialization.KSerializer serializer(...);
-}
--keep,includedescriptorclasses class com.darkxwn.payping.domain.backup.**$$serializer { *; }
+
+# Keep PayPing JSON backup DTOs intact under R8 Full Mode
+-keep @kotlinx.serialization.Serializable class com.darkxwn.payping.domain.backup.** { *; }
 -keepclassmembers class com.darkxwn.payping.domain.backup.** {
     *** Companion;
 }
