@@ -75,17 +75,37 @@
     <string name="dialog_delete_history_item_body">Remove "%1$s" from payment history?</string>
 
     <!-- Settings Screen -->
+    <string name="action_back">Back</string>
     <string name="settings_section_general">General</string>
     <string name="settings_language">Language</string>
+    <string name="language_system_option">Default (%1$s)</string>
+    <string name="language_system_short">Default</string>
     <string name="language_ru">Русский</string>
     <string name="language_en">English</string>
     <string name="settings_theme">Theme</string>
-    <string name="theme_system">System</string>
+    <string name="settings_theme_screen_title">Theme</string>
+    <string name="theme_section_appearance">Appearance</string>
+    <string name="theme_auto">Auto</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="theme_section_pure_black">Pure black mode</string>
+    <string name="theme_black_standard">Standard</string>
+    <string name="theme_black_pure">Pure black</string>
+    <string name="theme_section_color">Theme color</string>
+    <string name="theme_color_material_you">Material You</string>
+    <string name="color_picker_title">Custom color</string>
+    <string name="color_picker_hex_label">HEX color</string>
+    <string name="color_picker_add">Add</string>
+    <string name="theme_section_bottom_bar">Bottom bar</string>
+    <string name="theme_bar_pinned">Pinned</string>
+    <string name="theme_bar_floating">Floating</string>
+    <string name="theme_section_liquid_glass">Liquid glass</string>
+    <string name="theme_glass_none">None</string>
+    <string name="theme_glass_standard">Standard</string>
+    <string name="theme_glass_maximum">Maximum</string>
     <string name="settings_default_currency">Default currency</string>
 
-    <string name="settings_section_notifications">Notifications &amp; Alarms</string>
+    <string name="settings_section_notifications">Notifications &amp; Reminders</string>
     <string name="settings_notifications_permission">Notifications permission</string>
     <string name="settings_exact_alarms">Exact schedule alarms</string>
     <string name="status_granted">Enabled</string>
@@ -93,7 +113,7 @@
     <string name="status_exact_fallback">Approximate (enable for exact minute delivery)</string>
     <string name="action_grant">Enable</string>
 
-    <string name="settings_section_backup">Backup (JSON)</string>
+    <string name="settings_section_backup">Backup</string>
     <string name="settings_export_json">Export to JSON</string>
     <string name="settings_export_desc">Save reminders, history, and preferences to a file</string>
     <string name="settings_import_json">Import from JSON</string>
@@ -107,8 +127,21 @@
     <string name="snackbar_import_success">Imported: %1$d payments, %2$d history records</string>
     <string name="snackbar_import_error">Invalid backup file</string>
 
-    <string name="settings_section_about">About</string>
-    <string name="settings_about_text">PayPing %1$s • Local-only offline storage • GPLv3</string>
+    <string name="settings_section_other">Other</string>
+    <string name="settings_disclaimer">Disclaimer</string>
+    <string name="settings_about">About</string>
+    <string name="disclaimer_placeholder_title">Notice</string>
+    <string name="disclaimer_placeholder_body">PayPing is an informational reminder assistant for personal payment tracking. The app is not a bank, payment service, or financial advisor. Check actual balances, due dates, and auto-debit rules directly with your bank or service provider. Detailed terms will be added here later.</string>
+    <string name="about_license_badge">GNU GPLv3</string>
+    <string name="about_description">Personal Android assistant for upcoming payment reminders, history tracking, and offline backups.</string>
+    <string name="about_check_updates">Check for updates</string>
+    <string name="about_update_stub_message">Automatic update check will be available in a future release</string>
+    <string name="about_section_more">More</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_telegram">Telegram</string>
+    <string name="about_telegram_stub_message">Telegram link will be added soon</string>
+    <string name="about_section_author">Author</string>
+    <string name="about_author_nick">darkxwn</string>
 
     <!-- Notifications -->
     <string name="notification_channel_name">Payment reminders</string>

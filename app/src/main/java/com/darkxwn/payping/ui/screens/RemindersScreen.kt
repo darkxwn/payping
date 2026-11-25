@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.darkxwn.payping.R
 import com.darkxwn.payping.domain.logic.CurrencyTotal
@@ -70,6 +73,7 @@ fun RemindersScreen(
     onAddClick: () -> Unit,
     onEditClick: (Long) -> Unit,
     onMarkDoneClick: (Long) -> Unit,
+    bottomBarClearance: Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -92,7 +96,8 @@ fun RemindersScreen(
             FloatingActionButton(
                 onClick = onAddClick,
                 containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(bottom = bottomBarClearance)
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
@@ -106,7 +111,12 @@ fun RemindersScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = 8.dp,
+                bottom = 96.dp + bottomBarClearance
+            ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (!hasNotificationPermission) {
@@ -118,7 +128,7 @@ fun RemindersScreen(
             }
 
             item(key = "summary_card") {
-                SummaryOverviewCard(
+                SummaryOverviewCards(
                     summary = uiState.summary,
                     defaultCurrencyCode = uiState.settings.defaultCurrencyCode
                 )
@@ -259,51 +269,79 @@ private fun NotificationPermissionBanner(
 }
 
 @Composable
-private fun SummaryOverviewCard(
+private fun SummaryOverviewCards(
     summary: ReminderSummary,
     defaultCurrencyCode: String
 ) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Max),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            SummarySplitCard(
+                label = stringResource(R.string.summary_next_7_days),
+                totals = summary.next7DaysTotals,
+                defaultCurrencyCode = defaultCurrencyCode,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
+            SummarySplitCard(
+                label = stringResource(R.string.summary_end_of_month),
+                totals = summary.endOfMonthTotals,
+                defaultCurrencyCode = defaultCurrencyCode,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
+        }
+
+        if (summary.overdueCount > 0) {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.72f)
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.summary_includes_overdue, summary.overdueCount),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SummarySplitCard(
+    label: String,
+    totals: List<CurrencyTotal>,
+    defaultCurrencyCode: String,
+    modifier: Modifier = Modifier
+) {
     Card(
+        modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
-        Column(
+        SummaryColumn(
+            label = label,
+            totals = totals,
+            defaultCurrencyCode = defaultCurrencyCode,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                SummaryColumn(
-                    label = stringResource(R.string.summary_next_7_days),
-                    totals = summary.next7DaysTotals,
-                    defaultCurrencyCode = defaultCurrencyCode,
-                    modifier = Modifier.weight(1f)
-                )
-                SummaryColumn(
-                    label = stringResource(R.string.summary_end_of_month),
-                    totals = summary.endOfMonthTotals,
-                    defaultCurrencyCode = defaultCurrencyCode,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            if (summary.overdueCount > 0) {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f)
-                )
-                Text(
-                    text = stringResource(R.string.summary_includes_overdue, summary.overdueCount),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
+                .padding(14.dp)
+        )
     }
 }
 

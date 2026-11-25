@@ -75,17 +75,37 @@
     <string name="dialog_delete_history_item_body">Удалить «%1$s» из истории платежей?</string>
 
     <!-- Settings Screen -->
+    <string name="action_back">Назад</string>
     <string name="settings_section_general">Основные</string>
     <string name="settings_language">Язык</string>
+    <string name="language_system_option">По умолчанию (%1$s)</string>
+    <string name="language_system_short">По умолчанию</string>
     <string name="language_ru">Русский</string>
     <string name="language_en">English</string>
-    <string name="settings_theme">Тема оформления</string>
-    <string name="theme_system">Системная</string>
+    <string name="settings_theme">Тема</string>
+    <string name="settings_theme_screen_title">Тема</string>
+    <string name="theme_section_appearance">Оформление</string>
+    <string name="theme_auto">Авто</string>
     <string name="theme_light">Светлая</string>
     <string name="theme_dark">Тёмная</string>
+    <string name="theme_section_pure_black">Чисто чёрный режим</string>
+    <string name="theme_black_standard">Стандартный</string>
+    <string name="theme_black_pure">Чисто чёрный</string>
+    <string name="theme_section_color">Цвет темы</string>
+    <string name="theme_color_material_you">Material You</string>
+    <string name="color_picker_title">Свой цвет</string>
+    <string name="color_picker_hex_label">HEX-код</string>
+    <string name="color_picker_add">Добавить</string>
+    <string name="theme_section_bottom_bar">Нижняя панель</string>
+    <string name="theme_bar_pinned">Закреплённая</string>
+    <string name="theme_bar_floating">Плавающая</string>
+    <string name="theme_section_liquid_glass">Жидкое стекло</string>
+    <string name="theme_glass_none">Нет</string>
+    <string name="theme_glass_standard">Стандартный</string>
+    <string name="theme_glass_maximum">Максимум</string>
     <string name="settings_default_currency">Валюта по умолчанию</string>
 
-    <string name="settings_section_notifications">Уведомления и будильники</string>
+    <string name="settings_section_notifications">Уведомления и напоминания</string>
     <string name="settings_notifications_permission">Разрешение на уведомления</string>
     <string name="settings_exact_alarms">Точное время срабатывания</string>
     <string name="status_granted">Включено</string>
@@ -93,7 +113,7 @@
     <string name="status_exact_fallback">Приблизительно (включите для точности до минуты)</string>
     <string name="action_grant">Включить</string>
 
-    <string name="settings_section_backup">Резервная копия (JSON)</string>
+    <string name="settings_section_backup">Резервная копия</string>
     <string name="settings_export_json">Экспорт в JSON</string>
     <string name="settings_export_desc">Сохранить списания, историю и настройки в файл</string>
     <string name="settings_import_json">Импорт из JSON</string>
@@ -107,8 +127,21 @@
     <string name="snackbar_import_success">Импортировано: %1$d списаний, %2$d в истории</string>
     <string name="snackbar_import_error">Некорректный файл резервной копии</string>
 
-    <string name="settings_section_about">О приложении</string>
-    <string name="settings_about_text">PayPing %1$s • Локальное хранение без сервера • GPLv3</string>
+    <string name="settings_section_other">Другое</string>
+    <string name="settings_disclaimer">Отказ от ответственности</string>
+    <string name="settings_about">О программе</string>
+    <string name="disclaimer_placeholder_title">Информация</string>
+    <string name="disclaimer_placeholder_body">PayPing — информационный помощник для личного учёта и напоминаний о платежах. Приложение не является банком, платёжным сервисом или финансовым консультантом. Всегда проверяйте актуальные суммы, сроки и автосписания у своего банка или поставщика услуг. Подробный текст раздела будет дополнен позже.</string>
+    <string name="about_license_badge">GNU GPLv3</string>
+    <string name="about_description">Личный Android-помощник для напоминаний о предстоящих списаниях, ведения истории и резервного копирования данных.</string>
+    <string name="about_check_updates">Проверить обновление</string>
+    <string name="about_update_stub_message">Проверка обновлений будет добавлена в следующем обновлении</string>
+    <string name="about_section_more">Ещё</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_telegram">Telegram</string>
+    <string name="about_telegram_stub_message">Ссылка на Telegram-канал будет добавлена позже</string>
+    <string name="about_section_author">Автор</string>
+    <string name="about_author_nick">darkxwn</string>
 
     <!-- Notifications -->
     <string name="notification_channel_name">Напоминания о списаниях</string>

@@ -4,10 +4,14 @@ import com.darkxwn.payping.domain.backup.BackupSerializer
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
+import com.darkxwn.payping.domain.model.BaseAccentColor
+import com.darkxwn.payping.domain.model.BottomBarStyle
+import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import com.darkxwn.payping.domain.model.PaymentHistory
 import com.darkxwn.payping.domain.model.PaymentReminder
 import com.darkxwn.payping.domain.model.RecurrenceType
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -61,8 +65,14 @@ class MoneyAndBackupTest {
             )
         )
         val settings = AppSettings(
-            language = AppLanguage.RU,
+            language = AppLanguage.SYSTEM,
             themeMode = AppThemeMode.DARK,
+            pureBlack = true,
+            useDynamicColor = false,
+            accentColorArgb = 0xFF4F46E5L,
+            customAccentColors = listOf(0xFF4F46E5L, 0xFF00BCD4L),
+            bottomBarStyle = BottomBarStyle.FLOATING,
+            liquidGlassLevel = LiquidGlassLevel.MAXIMUM,
             defaultCurrencyCode = "EUR"
         )
 
@@ -76,6 +86,50 @@ class MoneyAndBackupTest {
         assertEquals(listOf(0, 1, 3), decoded.reminders[0].remindDaysBefore)
         assertEquals(1, decoded.history.size)
         assertEquals(LocalDate.of(2026, 11, 1), decoded.history[0].dueDate)
+    }
+
+    @Test
+    fun backupSerializer_decodesLegacySettingsDefaults() {
+        val legacyJson = """
+            {
+              "schemaVersion": 1,
+              "exportedAtEpochMillis": 1795600000000,
+              "settings": {
+                "language": "RU",
+                "themeMode": "DARK",
+                "defaultCurrencyCode": "USD"
+              },
+              "reminders": [],
+              "history": []
+            }
+        """.trimIndent()
+
+        val decoded = BackupSerializer.decode(legacyJson).getOrThrow()
+        val settings = decoded.settings
+        assertEquals(AppLanguage.RU, settings.language)
+        assertEquals(AppThemeMode.DARK, settings.themeMode)
+        assertEquals("USD", settings.defaultCurrencyCode)
+        assertFalse(settings.pureBlack)
+        assertFalse(settings.useDynamicColor)
+        assertEquals(BaseAccentColor.DEFAULT_ARGB, settings.accentColorArgb)
+        assertTrue(settings.customAccentColors.isEmpty())
+        assertEquals(BottomBarStyle.PINNED, settings.bottomBarStyle)
+        assertEquals(LiquidGlassLevel.NONE, settings.liquidGlassLevel)
+    }
+
+    @Test
+    fun appLanguage_and_accentColorHelpers_workCorrectly() {
+        assertEquals("ru", AppLanguage.SYSTEM.resolvedLocaleTag("ru"))
+        assertEquals("en", AppLanguage.SYSTEM.resolvedLocaleTag("de"))
+        assertEquals("ru", AppLanguage.RU.resolvedLocaleTag("en"))
+        assertEquals(AppLanguage.SYSTEM, AppLanguage.fromTag(null))
+        assertEquals(AppLanguage.SYSTEM, AppLanguage.fromTag("system"))
+        assertEquals(AppLanguage.EN, AppLanguage.fromTag("en"))
+
+        assertEquals(0xFF4F46E5L, BaseAccentColor.parseHex("#4f46e5"))
+        assertEquals(0xFF4F46E5L, BaseAccentColor.parseHex("4F46E5"))
+        assertNull(BaseAccentColor.parseHex("bad"))
+        assertEquals("#4F46E5", BaseAccentColor.formatHex(0x124F46E5L))
     }
 
     @Test

@@ -3,7 +3,10 @@ package com.darkxwn.payping.domain.backup
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
+import com.darkxwn.payping.domain.model.BaseAccentColor
+import com.darkxwn.payping.domain.model.BottomBarStyle
 import com.darkxwn.payping.domain.model.CurrencyOption
+import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import com.darkxwn.payping.domain.model.PaymentHistory
 import com.darkxwn.payping.domain.model.PaymentReminder
 import com.darkxwn.payping.domain.model.RecurrenceType
@@ -30,6 +33,12 @@ data class BackupPayload(
 data class BackupSettingsDto(
     val language: String? = null,
     val themeMode: String? = null,
+    val pureBlack: Boolean = false,
+    val useDynamicColor: Boolean = false,
+    val accentColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
+    val customAccentColors: List<Long> = emptyList(),
+    val bottomBarStyle: String? = null,
+    val liquidGlassLevel: String? = null,
     val defaultCurrencyCode: String? = null
 )
 
@@ -88,6 +97,12 @@ object BackupSerializer {
             settings = BackupSettingsDto(
                 language = settings.language.name,
                 themeMode = settings.themeMode.name,
+                pureBlack = settings.pureBlack,
+                useDynamicColor = settings.useDynamicColor,
+                accentColorArgb = BaseAccentColor.normalizeOpaqueArgb(settings.accentColorArgb),
+                customAccentColors = settings.customAccentColors.map(BaseAccentColor::normalizeOpaqueArgb),
+                bottomBarStyle = settings.bottomBarStyle.name,
+                liquidGlassLevel = settings.liquidGlassLevel.name,
                 defaultCurrencyCode = settings.defaultCurrencyCode
             ),
             reminders = reminders.map { reminder ->
@@ -130,8 +145,16 @@ object BackupSerializer {
 
         val parsedSettings = payload.settings?.let { dto ->
             AppSettings(
-                language = enumValueOrNull<AppLanguage>(dto.language) ?: AppLanguage.fromSystem(),
+                language = enumValueOrNull<AppLanguage>(dto.language) ?: AppLanguage.SYSTEM,
                 themeMode = enumValueOrNull<AppThemeMode>(dto.themeMode) ?: AppThemeMode.SYSTEM,
+                pureBlack = dto.pureBlack,
+                useDynamicColor = dto.useDynamicColor,
+                accentColorArgb = BaseAccentColor.normalizeOpaqueArgb(dto.accentColorArgb),
+                customAccentColors = dto.customAccentColors
+                    .map(BaseAccentColor::normalizeOpaqueArgb)
+                    .distinct(),
+                bottomBarStyle = enumValueOrNull<BottomBarStyle>(dto.bottomBarStyle) ?: BottomBarStyle.PINNED,
+                liquidGlassLevel = enumValueOrNull<LiquidGlassLevel>(dto.liquidGlassLevel) ?: LiquidGlassLevel.NONE,
                 defaultCurrencyCode = CurrencyOption.fromCode(dto.defaultCurrencyCode).code
             )
         }

@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.darkxwn.payping.R
 import com.darkxwn.payping.domain.logic.MoneyFormat
@@ -58,6 +59,7 @@ fun HistoryScreen(
     language: AppLanguage,
     onDeleteItem: (Long) -> Unit,
     onClearAll: () -> Unit,
+    bottomBarClearance: Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
     var showClearAllConfirm by remember { mutableStateOf(false) }
@@ -95,6 +97,7 @@ fun HistoryScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
+                    .padding(bottom = bottomBarClearance)
                     .padding(24.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -123,7 +126,12 @@ fun HistoryScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 16.dp,
+                    bottom = 16.dp + bottomBarClearance
+                ),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(history, key = { it.id }) { item ->

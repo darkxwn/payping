@@ -58,9 +58,11 @@ import com.darkxwn.payping.R
 import com.darkxwn.payping.domain.logic.MoneyFormat
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.CurrencyOption
+import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import com.darkxwn.payping.domain.model.PaymentReminder
 import com.darkxwn.payping.domain.model.RecurrenceType
 import com.darkxwn.payping.domain.model.ReminderConstants
+import com.darkxwn.payping.ui.components.CircularBackButton
 import com.darkxwn.payping.ui.components.formatLocalDate
 import com.darkxwn.payping.ui.components.recurrenceLabel
 import com.darkxwn.payping.ui.components.remindDayFullLabel
@@ -78,6 +80,7 @@ fun ReminderEditScreen(
     onSave: (PaymentReminder) -> Unit,
     onDelete: (Long) -> Unit,
     onNavigateBack: () -> Unit,
+    liquidGlassLevel: LiquidGlassLevel = LiquidGlassLevel.NONE,
     modifier: Modifier = Modifier
 ) {
     val isEditMode = reminderId > 0L
@@ -145,12 +148,12 @@ fun ReminderEditScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = stringResource(R.string.action_cancel)
-                        )
-                    }
+                    CircularBackButton(
+                        liquidGlassLevel = liquidGlassLevel,
+                        onClick = onNavigateBack,
+                        contentDescription = stringResource(R.string.action_cancel),
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
                 },
                 actions = {
                     if (isEditMode) {

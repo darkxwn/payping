@@ -35,17 +35,18 @@ fun remindDayFullLabel(daysBefore: Int): String = if (daysBefore == 0) {
     stringResource(R.string.remind_day_n, daysBefore)
 }
 
+private fun AppLanguage.toJavaLocale(): Locale =
+    Locale(resolvedLocaleTag(resolveSystemLanguageTag()))
+
 fun formatLocalDate(date: LocalDate, language: AppLanguage): String {
-    val locale = Locale(language.tag)
-    val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
+    val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(language.toJavaLocale())
     return date.format(formatter)
 }
 
 fun formatDateTimeMillis(epochMillis: Long, language: AppLanguage): String {
-    val locale = Locale(language.tag)
     val formatter = DateTimeFormatter
         .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-        .withLocale(locale)
+        .withLocale(language.toJavaLocale())
     return Instant.ofEpochMilli(epochMillis)
         .atZone(ZoneId.systemDefault())
         .format(formatter)

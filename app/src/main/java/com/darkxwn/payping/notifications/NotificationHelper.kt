@@ -16,6 +16,7 @@ import com.darkxwn.payping.R
 import com.darkxwn.payping.domain.logic.MoneyFormat
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.PaymentReminder
+import com.darkxwn.payping.ui.components.resolveSystemLanguageTag
 import java.util.Locale
 
 object NotificationHelper {
@@ -25,7 +26,7 @@ object NotificationHelper {
     const val EXTRA_NOTIFICATION_ID = "extra_notification_id"
     const val ACTION_MARK_DONE = "com.darkxwn.payping.action.MARK_DONE"
 
-    fun ensureChannel(context: Context, language: AppLanguage = AppLanguage.fromSystem()) {
+    fun ensureChannel(context: Context, language: AppLanguage = AppLanguage.SYSTEM) {
         val localizedCtx = localizedContext(context, language)
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channel = NotificationChannel(
@@ -119,7 +120,7 @@ object NotificationHelper {
         ("payping:$reminderId:$daysBefore").hashCode()
 
     fun localizedContext(context: Context, language: AppLanguage): Context {
-        val locale = Locale(language.tag)
+        val locale = Locale(language.resolvedLocaleTag(resolveSystemLanguageTag()))
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
         return context.createConfigurationContext(config)

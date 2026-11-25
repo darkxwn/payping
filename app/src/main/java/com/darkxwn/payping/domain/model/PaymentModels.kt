@@ -17,20 +17,59 @@ enum class AppThemeMode {
     DARK
 }
 
-enum class AppLanguage(val tag: String) {
+enum class BottomBarStyle {
+    PINNED,
+    FLOATING
+}
+
+enum class LiquidGlassLevel {
+    NONE,
+    STANDARD,
+    MAXIMUM
+}
+
+enum class BaseAccentColor(val argb: Long) {
+    EMERALD(0xFF0E7C66L),
+    OCEAN(0xFF1565C0L),
+    INDIGO(0xFF4F46E5L),
+    AMBER(0xFFB45309L),
+    ROSE(0xFFBE185DL),
+    GRAPHITE(0xFF455A64L);
+
+    companion object {
+        const val DEFAULT_ARGB = 0xFF0E7C66L
+
+        fun normalizeOpaqueArgb(argb: Long): Long =
+            0xFF000000L or (argb and 0x00FFFFFFL)
+
+        fun formatHex(argb: Long): String =
+            "#%06X".format(Locale.US, (argb and 0x00FFFFFFL))
+
+        fun parseHex(raw: String): Long? {
+            val clean = raw.trim().removePrefix("#")
+            if (clean.length != 6) return null
+            val rgb = clean.toLongOrNull(16) ?: return null
+            return 0xFF000000L or rgb
+        }
+    }
+}
+
+enum class AppLanguage(val tag: String?) {
+    SYSTEM(null),
     RU("ru"),
     EN("en");
 
+    fun resolvedLocaleTag(systemLanguageTag: String = Locale.getDefault().language): String {
+        if (tag != null) return tag
+        return if (systemLanguageTag.equals("ru", ignoreCase = true)) "ru" else "en"
+    }
+
     companion object {
         fun fromTag(tag: String?): AppLanguage = when {
+            tag.isNullOrBlank() || tag.equals("system", ignoreCase = true) -> SYSTEM
             tag.equals("ru", ignoreCase = true) -> RU
             tag.equals("en", ignoreCase = true) -> EN
-            else -> fromSystem()
-        }
-
-        fun fromSystem(): AppLanguage {
-            val lang = Locale.getDefault().language
-            return if (lang.equals("ru", ignoreCase = true)) RU else EN
+            else -> SYSTEM
         }
     }
 }
@@ -89,7 +128,13 @@ data class PaymentHistory(
 )
 
 data class AppSettings(
-    val language: AppLanguage = AppLanguage.fromSystem(),
+    val language: AppLanguage = AppLanguage.SYSTEM,
     val themeMode: AppThemeMode = AppThemeMode.SYSTEM,
+    val pureBlack: Boolean = false,
+    val useDynamicColor: Boolean = false,
+    val accentColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
+    val customAccentColors: List<Long> = emptyList(),
+    val bottomBarStyle: BottomBarStyle = BottomBarStyle.PINNED,
+    val liquidGlassLevel: LiquidGlassLevel = LiquidGlassLevel.NONE,
     val defaultCurrencyCode: String = CurrencyOption.RUB.code
 )

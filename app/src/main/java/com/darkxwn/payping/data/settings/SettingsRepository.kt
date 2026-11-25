@@ -3,13 +3,18 @@ package com.darkxwn.payping.data.settings
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
+import com.darkxwn.payping.domain.model.BaseAccentColor
+import com.darkxwn.payping.domain.model.BottomBarStyle
 import com.darkxwn.payping.domain.model.CurrencyOption
+import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -21,18 +26,36 @@ class SettingsRepository(private val context: Context) {
     private object Keys {
         val LANGUAGE = stringPreferencesKey("language")
         val THEME_MODE = stringPreferencesKey("theme_mode")
+        val PURE_BLACK = booleanPreferencesKey("pure_black")
+        val USE_DYNAMIC_COLOR = booleanPreferencesKey("use_dynamic_color")
+        val ACCENT_COLOR_ARGB = longPreferencesKey("accent_color_argb")
+        val CUSTOM_ACCENT_COLORS = stringPreferencesKey("custom_accent_colors")
+        val BOTTOM_BAR_STYLE = stringPreferencesKey("bottom_bar_style")
+        val LIQUID_GLASS_LEVEL = stringPreferencesKey("liquid_glass_level")
         val DEFAULT_CURRENCY = stringPreferencesKey("default_currency")
     }
 
     val settings: Flow<AppSettings> = context.settingsDataStore.data.map { prefs ->
         val language = AppLanguage.fromTag(prefs[Keys.LANGUAGE])
-        val themeMode = AppThemeMode.entries.firstOrNull {
-            it.name.equals(prefs[Keys.THEME_MODE], ignoreCase = true)
-        } ?: AppThemeMode.SYSTEM
+        val themeMode = enumOrDefault(prefs[Keys.THEME_MODE], AppThemeMode.SYSTEM)
+        val pureBlack = prefs[Keys.PURE_BLACK] ?: false
+        val useDynamicColor = prefs[Keys.USE_DYNAMIC_COLOR] ?: false
+        val accentColorArgb = prefs[Keys.ACCENT_COLOR_ARGB]?.let(BaseAccentColor::normalizeOpaqueArgb)
+            ?: BaseAccentColor.DEFAULT_ARGB
+        val customColors = decodeCustomColors(prefs[Keys.CUSTOM_ACCENT_COLORS])
+        val bottomBarStyle = enumOrDefault(prefs[Keys.BOTTOM_BAR_STYLE], BottomBarStyle.PINNED)
+        val liquidGlassLevel = enumOrDefault(prefs[Keys.LIQUID_GLASS_LEVEL], LiquidGlassLevel.NONE)
         val currency = CurrencyOption.fromCode(prefs[Keys.DEFAULT_CURRENCY]).code
+
         AppSettings(
             language = language,
             themeMode = themeMode,
+            pureBlack = pureBlack,
+            useDynamicColor = useDynamicColor,
+            accentColorArgb = accentColorArgb,
+            customAccentColors = customColors,
+            bottomBarStyle = bottomBarStyle,
+            liquidGlassLevel = liquidGlassLevel,
             defaultCurrencyCode = currency
         )
     }
@@ -41,13 +64,69 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setLanguage(language: AppLanguage) {
         context.settingsDataStore.edit { prefs ->
-            prefs[Keys.LANGUAGE] = language.tag
+            prefs[Keys.LANGUAGE] = language.tag ?: "system"
         }
     }
 
     suspend fun setThemeMode(themeMode: AppThemeMode) {
         context.settingsDataStore.edit { prefs ->
             prefs[Keys.THEME_MODE] = themeMode.name
+        }
+    }
+
+    suspend fun setPureBlack(enabled: Boolean) {
+        context.settingsDataStore.edit { prefs ->
+            prefs[Keys.PURE_BLACK] = enabled
+        }
+    }
+
+    suspend fun selectAccentColor(argb: Long) {
+        val normalized = BaseAccentColor.normalizeOpaqueArgb(argb)
+        context.settingsDataStore.edit { prefs ->
+            prefs[Keys.USE_DYNAMIC_COLOR] = false
+            prefs[Keys.ACCENT_COLOR_ARGB] = normalized
+        }
+    }
+
+    suspend fun selectDynamicColor() {
+        context.settingsDataStore.edit { prefs ->
+            prefs[Keys.USE_DYNAMIC_COLOR] = true
+        }
+    }
+
+    suspend fun addCustomAccentColor(argb: Long) {
+        val normalized = BaseAccentColor.normalizeOpaqueArgb(argb)
+        context.settingsDataStore.edit { prefs ->
+            val current = decodeCustomColors(prefs[Keys.CUSTOM_ACCENT_COLORS])
+            val isBaseColor = BaseAccentColor.entries.any { it.argb == normalized }
+            val updated = if (isBaseColor || normalized in current) current else current + normalized
+            prefs[Keys.CUSTOM_ACCENT_COLORS] = encodeCustomColors(updated)
+            prefs[Keys.USE_DYNAMIC_COLOR] = false
+            prefs[Keys.ACCENT_COLOR_ARGB] = normalized
+        }
+    }
+
+    suspend fun removeCustomAccentColor(argb: Long) {
+        val normalized = BaseAccentColor.normalizeOpaqueArgb(argb)
+        context.settingsDataStore.edit { prefs ->
+            val current = decodeCustomColors(prefs[Keys.CUSTOM_ACCENT_COLORS])
+            val updated = current.filterNot { it == normalized }
+            prefs[Keys.CUSTOM_ACCENT_COLORS] = encodeCustomColors(updated)
+            if (prefs[Keys.ACCENT_COLOR_ARGB] == normalized) {
+                prefs[Keys.ACCENT_COLOR_ARGB] = BaseAccentColor.DEFAULT_ARGB
+            }
+        }
+    }
+
+    suspend fun setBottomBarStyle(style: BottomBarStyle) {
+        context.settingsDataStore.edit { prefs ->
+            prefs[Keys.BOTTOM_BAR_STYLE] = style.name
+        }
+    }
+
+    suspend fun setLiquidGlassLevel(level: LiquidGlassLevel) {
+        context.settingsDataStore.edit { prefs ->
+            prefs[Keys.LIQUID_GLASS_LEVEL] = level.name
         }
     }
 
@@ -60,9 +139,33 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun applyBackupSettings(imported: AppSettings) {
         context.settingsDataStore.edit { prefs ->
-            prefs[Keys.LANGUAGE] = imported.language.tag
+            prefs[Keys.LANGUAGE] = imported.language.tag ?: "system"
             prefs[Keys.THEME_MODE] = imported.themeMode.name
+            prefs[Keys.PURE_BLACK] = imported.pureBlack
+            prefs[Keys.USE_DYNAMIC_COLOR] = imported.useDynamicColor
+            prefs[Keys.ACCENT_COLOR_ARGB] = BaseAccentColor.normalizeOpaqueArgb(imported.accentColorArgb)
+            prefs[Keys.CUSTOM_ACCENT_COLORS] = encodeCustomColors(
+                imported.customAccentColors.map(BaseAccentColor::normalizeOpaqueArgb).distinct()
+            )
+            prefs[Keys.BOTTOM_BAR_STYLE] = imported.bottomBarStyle.name
+            prefs[Keys.LIQUID_GLASS_LEVEL] = imported.liquidGlassLevel.name
             prefs[Keys.DEFAULT_CURRENCY] = CurrencyOption.fromCode(imported.defaultCurrencyCode).code
         }
+    }
+
+    private fun decodeCustomColors(raw: String?): List<Long> {
+        if (raw.isNullOrBlank()) return emptyList()
+        return raw.split(',')
+            .mapNotNull { token -> token.trim().toLongOrNull(16) }
+            .map(BaseAccentColor::normalizeOpaqueArgb)
+            .distinct()
+    }
+
+    private fun encodeCustomColors(colors: List<Long>): String =
+        colors.joinToString(",") { (it and 0x00FFFFFFL).toString(16).padStart(6, '0') }
+
+    private inline fun <reified T : Enum<T>> enumOrDefault(raw: String?, default: T): T {
+        if (raw.isNullOrBlank()) return default
+        return enumValues<T>().firstOrNull { it.name.equals(raw.trim(), ignoreCase = true) } ?: default
     }
 }

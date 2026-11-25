@@ -15,6 +15,8 @@ import com.darkxwn.payping.domain.logic.ReminderSummary
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
+import com.darkxwn.payping.domain.model.BottomBarStyle
+import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import com.darkxwn.payping.domain.model.PaymentHistory
 import com.darkxwn.payping.domain.model.PaymentReminder
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -141,15 +143,55 @@ class PayPingViewModel(
     fun setLanguage(language: AppLanguage) {
         viewModelScope.launch {
             settingsRepository.setLanguage(language)
-            AppCompatDelegate.setApplicationLocales(
-                LocaleListCompat.forLanguageTags(language.tag)
-            )
+            AppCompatDelegate.setApplicationLocales(language.toLocaleListCompat())
         }
     }
 
     fun setThemeMode(mode: AppThemeMode) {
         viewModelScope.launch {
             settingsRepository.setThemeMode(mode)
+        }
+    }
+
+    fun setPureBlack(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setPureBlack(enabled)
+        }
+    }
+
+    fun selectAccentColor(argb: Long) {
+        viewModelScope.launch {
+            settingsRepository.selectAccentColor(argb)
+        }
+    }
+
+    fun selectDynamicColor() {
+        viewModelScope.launch {
+            settingsRepository.selectDynamicColor()
+        }
+    }
+
+    fun addCustomAccentColor(argb: Long) {
+        viewModelScope.launch {
+            settingsRepository.addCustomAccentColor(argb)
+        }
+    }
+
+    fun removeCustomAccentColor(argb: Long) {
+        viewModelScope.launch {
+            settingsRepository.removeCustomAccentColor(argb)
+        }
+    }
+
+    fun setBottomBarStyle(style: BottomBarStyle) {
+        viewModelScope.launch {
+            settingsRepository.setBottomBarStyle(style)
+        }
+    }
+
+    fun setLiquidGlassLevel(level: LiquidGlassLevel) {
+        viewModelScope.launch {
+            settingsRepository.setLiquidGlassLevel(level)
         }
     }
 
@@ -180,7 +222,7 @@ class PayPingViewModel(
                 .onSuccess { summary ->
                     summary.importedSettings?.let { imported ->
                         AppCompatDelegate.setApplicationLocales(
-                            LocaleListCompat.forLanguageTags(imported.language.tag)
+                            imported.language.toLocaleListCompat()
                         )
                     }
                     _events.emit(UiFeedbackEvent.ImportSuccess(summary))
@@ -198,3 +240,6 @@ class PayPingViewModel(
         }
     }
 }
+
+private fun AppLanguage.toLocaleListCompat(): LocaleListCompat =
+    tag?.let(LocaleListCompat::forLanguageTags) ?: LocaleListCompat.getEmptyLocaleList()
