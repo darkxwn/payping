@@ -105,7 +105,7 @@ class MoneyAndBackupTest {
         """.trimIndent()
 
         val decoded = BackupSerializer.decode(legacyJson).getOrThrow()
-        val settings = decoded.settings
+        val settings = requireNotNull(decoded.settings)
         assertEquals(AppLanguage.RU, settings.language)
         assertEquals(AppThemeMode.DARK, settings.themeMode)
         assertEquals("USD", settings.defaultCurrencyCode)
