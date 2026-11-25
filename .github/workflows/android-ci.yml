@@ -20,8 +20,8 @@ on:
         type: boolean
 
 concurrency:
-  group: payping-${{ github.event_name == 'pull_request' && github.head_ref || 'main-release' }}
-  cancel-in-progress: false
+  group: payping-${{ github.event_name == 'pull_request' && format('pr-{0}', github.head_ref) || (github.event_name == 'workflow_dispatch' && format('dispatch-{0}', github.run_id) || github.ref) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')) }}
 
 jobs:
   build:
@@ -115,9 +115,6 @@ jobs:
       - name: Run unit tests
         run: gradle testDebugUnitTest -PversionName=${{ steps.version.outputs.version_name }} -PbuildNumber=${{ github.run_number }} --stacktrace
 
-      - name: Build Debug APKs
-        run: gradle assembleDebug -PversionName=${{ steps.version.outputs.version_name }} -PbuildNumber=${{ github.run_number }} --stacktrace
-
       - name: Upload unit test report
         if: always()
         uses: actions/upload-artifact@v4
@@ -129,7 +126,7 @@ jobs:
 
       - name: Check Release signing secrets
         id: signing
-        if: github.event_name != 'pull_request'
+        if: steps.version.outputs.is_tag == 'true' || steps.version.outputs.is_dispatch == 'true'
         env:
           KEYSTORE_B64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
           STORE_PASS: ${{ secrets.SIGNING_STORE_PASSWORD }}
@@ -144,7 +141,7 @@ jobs:
             echo "keystore_path=$RUNNER_TEMP/release.jks" >> "$GITHUB_OUTPUT"
           else
             echo "available=false" >> "$GITHUB_OUTPUT"
-            if [[ "${{ steps.version.outputs.is_tag }}" == "true" || ( "${{ steps.version.outputs.is_dispatch }}" == "true" && "${{ inputs.create_release }}" == "true" ) ]]; then
+            if [[ "${{ steps.version.outputs.is_tag }}" == "true" || "${{ inputs.create_release }}" == "true" ]]; then
               echo "::error::Missing release signing secrets (SIGNING_KEYSTORE_BASE64, SIGNING_STORE_PASSWORD, SIGNING_KEY_ALIAS, SIGNING_KEY_PASSWORD)."
               exit 1
             else
@@ -152,8 +149,12 @@ jobs:
             fi
           fi
 
+      - name: Build Debug APKs (unsigned fallback)
+        if: (steps.version.outputs.is_tag == 'true' || steps.version.outputs.is_dispatch == 'true') && steps.signing.outputs.available != 'true'
+        run: gradle assembleDebug -PversionName=${{ steps.version.outputs.version_name }} -PbuildNumber=${{ github.run_number }} --stacktrace
+
       - name: Build signed Release APKs (Universal, ARMv8, ARMv7, x64)
-        if: github.event_name != 'pull_request' && steps.signing.outputs.available == 'true'
+        if: (steps.version.outputs.is_tag == 'true' || steps.version.outputs.is_dispatch == 'true') && steps.signing.outputs.available == 'true'
         env:
           SIGNING_KEYSTORE_PATH: ${{ steps.signing.outputs.keystore_path }}
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
@@ -166,7 +167,7 @@ jobs:
             --stacktrace
 
       - name: Prepare named APK assets
-        if: github.event_name != 'pull_request' && steps.signing.outputs.available == 'true'
+        if: (steps.version.outputs.is_tag == 'true' || steps.version.outputs.is_dispatch == 'true') && steps.signing.outputs.available == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -183,7 +184,7 @@ jobs:
           ls -lh dist/
 
       - name: Upload Release APKs as workflow artifacts
-        if: github.event_name != 'pull_request' && steps.signing.outputs.available == 'true'
+        if: (steps.version.outputs.is_tag == 'true' || steps.version.outputs.is_dispatch == 'true') && steps.signing.outputs.available == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: payping-release-apks
@@ -191,7 +192,7 @@ jobs:
           retention-days: 30
 
       - name: Publish or update GitHub Release
-        if: github.event_name != 'pull_request' && steps.signing.outputs.available == 'true'
+        if: (steps.version.outputs.is_tag == 'true' || (steps.version.outputs.is_dispatch == 'true' && inputs.create_release == true)) && steps.signing.outputs.available == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
