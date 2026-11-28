@@ -156,4 +156,47 @@
     <string name="notification_title_in_days">In %1$d days: %2$s</string>
     <string name="notification_body_amount">Amount: %1$s</string>
     <string name="notification_body_with_note">Amount: %1$s • %2$s</string>
+    <string name="notification_title_auto_today">Auto-debit today: %1$s</string>
+    <string name="notification_title_auto_tomorrow">Auto-debit tomorrow: %1$s</string>
+    <string name="notification_title_auto_in_days">Auto-debit in %1$d days: %2$s</string>
+    <string name="notification_body_auto_amount">Check your balance • %1$s</string>
+    <string name="notification_body_auto_with_note">Check your balance • %1$s • %2$s</string>
+    <string name="notification_title_trial_today">Trial ends today: %1$s</string>
+    <string name="notification_title_trial_tomorrow">Trial renews tomorrow: %1$s</string>
+    <string name="notification_title_trial_in_days">Trial ends in %1$d days: %2$s</string>
+    <string name="notification_body_trial_amount">Cancel before charge • %1$s</string>
+    <string name="notification_body_trial_with_note">Cancel before charge • %1$s • %2$s</string>
+
+    <!-- Stage 1: Payment Types, Categories, Badges, Currency Catalog -->
+    <string name="field_payment_type_label">Payment type</string>
+    <string name="payment_type_manual">Manual</string>
+    <string name="payment_type_auto_debit">Auto</string>
+    <string name="payment_type_trial">Trial</string>
+    <string name="payment_type_installment">Installment</string>
+
+    <string name="settings_categories">Categories</string>
+    <string name="field_category_label">Category</string>
+    <string name="categories_builtin_section">Built-in</string>
+    <string name="categories_custom_section">My categories</string>
+    <string name="action_create_category">Create category</string>
+    <string name="dialog_category_create_title">New category</string>
+    <string name="dialog_category_edit_title">Edit category</string>
+    <string name="category_name_label">Name</string>
+    <string name="category_icon_label">Icon</string>
+    <string name="category_color_label">Color</string>
+    <string name="dialog_delete_category_title">Delete category?</string>
+    <string name="dialog_delete_category_body">Payments and history records using "%1$s" will move to "Other".</string>
+
+    <string name="badge_picker_title">Payment badge</string>
+    <string name="badge_mode_monogram">Text in circle</string>
+    <string name="badge_mode_service">Service icon</string>
+    <string name="badge_monogram_label">Text (1–2 chars or emoji)</string>
+    <string name="badge_service_search">Search service or bank</string>
+    <string name="badge_color_label">Circle color</string>
+
+    <string name="currency_picker_title">Currency</string>
+    <string name="currency_search_placeholder">Search name or code (e.g. TRY)</string>
+    <string name="currency_recent_section">Default &amp; recent</string>
+    <string name="currency_all_section">All currencies</string>
+    <string name="currency_search_empty">No matching currencies</string>
 </resources>

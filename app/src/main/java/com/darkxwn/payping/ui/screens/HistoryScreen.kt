@@ -2,6 +2,8 @@ package com.darkxwn.payping.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -39,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,10 +51,17 @@ import androidx.compose.ui.unit.dp
 import com.darkxwn.payping.R
 import com.darkxwn.payping.domain.logic.MoneyFormat
 import com.darkxwn.payping.domain.model.AppLanguage
+import com.darkxwn.payping.domain.model.CategoryCatalog
+import com.darkxwn.payping.domain.model.PaymentCategory
 import com.darkxwn.payping.domain.model.PaymentHistory
+import com.darkxwn.payping.domain.model.PaymentType
+import com.darkxwn.payping.ui.components.PaymentBadgeAvatar
 import com.darkxwn.payping.ui.components.formatDateTimeMillis
 import com.darkxwn.payping.ui.components.formatLocalDate
+import com.darkxwn.payping.ui.components.legibleCategoryAccentColor
+import com.darkxwn.payping.ui.components.paymentTypeLabel
 import com.darkxwn.payping.ui.components.recurrenceLabel
+import com.darkxwn.payping.ui.components.resolveSystemLanguageTag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +70,7 @@ fun HistoryScreen(
     language: AppLanguage,
     onDeleteItem: (Long) -> Unit,
     onClearAll: () -> Unit,
+    customCategories: List<PaymentCategory> = emptyList(),
     bottomBarClearance: Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
@@ -137,6 +149,7 @@ fun HistoryScreen(
                 items(history, key = { it.id }) { item ->
                     HistoryCard(
                         item = item,
+                        customCategories = customCategories,
                         language = language,
                         onDeleteClick = { itemToDelete = item }
                     )
@@ -198,12 +211,20 @@ fun HistoryScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun HistoryCard(
     item: PaymentHistory,
+    customCategories: List<PaymentCategory>,
     language: AppLanguage,
     onDeleteClick: () -> Unit
 ) {
+    val langTag = remember(language) {
+        language.resolvedLocaleTag(resolveSystemLanguageTag())
+    }
+    val category = CategoryCatalog.resolve(item.categoryUid, customCategories, langTag)
+    val categoryColor = legibleCategoryAccentColor(category.colorArgb)
+
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
@@ -215,16 +236,17 @@ private fun HistoryCard(
                 .padding(start = 14.dp, top = 12.dp, bottom = 12.dp, end = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Rounded.CheckCircle,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(22.dp)
+            PaymentBadgeAvatar(
+                title = item.title,
+                badgeIconKey = item.badgeIconKey,
+                badgeText = item.badgeText,
+                badgeColorArgb = item.badgeColorArgb,
+                size = 40.dp
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(3.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -260,6 +282,45 @@ private fun HistoryCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        color = Color(category.colorArgb).copy(alpha = 0.14f)
+                    ) {
+                        Text(
+                            text = category.name,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = categoryColor,
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                        )
+                    }
+                    if (item.paymentType != PaymentType.MANUAL) {
+                        Surface(
+                            shape = MaterialTheme.shapes.small,
+                            color = if (item.paymentType == PaymentType.TRIAL) {
+                                MaterialTheme.colorScheme.tertiaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.secondaryContainer
+                            }
+                        ) {
+                            Text(
+                                text = paymentTypeLabel(item.paymentType),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (item.paymentType == PaymentType.TRIAL) {
+                                    MaterialTheme.colorScheme.onTertiaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.onSecondaryContainer
+                                },
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
                 if (item.note.isNotBlank()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(

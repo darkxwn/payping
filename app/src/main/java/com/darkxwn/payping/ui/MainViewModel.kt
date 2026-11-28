@@ -18,6 +18,7 @@ import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
 import com.darkxwn.payping.domain.model.BottomBarStyle
 import com.darkxwn.payping.domain.model.LiquidGlassLevel
+import com.darkxwn.payping.domain.model.PaymentCategory
 import com.darkxwn.payping.domain.model.PaymentHistory
 import com.darkxwn.payping.domain.model.PaymentReminder
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -46,7 +47,8 @@ data class MainUiState(
         overdueTotals = emptyList(),
         overdueCount = 0
     ),
-    val history: List<PaymentHistory> = emptyList()
+    val history: List<PaymentHistory> = emptyList(),
+    val customCategories: List<PaymentCategory> = emptyList()
 )
 
 sealed interface UiFeedbackEvent {
@@ -74,8 +76,9 @@ class PayPingViewModel(
         todayFlow,
         settingsRepository.settings,
         paymentRepository.reminders,
-        paymentRepository.history
-    ) { today, settings, reminders, history ->
+        paymentRepository.history,
+        paymentRepository.categories
+    ) { today, settings, reminders, history, categories ->
         MainUiState(
             today = today,
             settings = settings,
@@ -86,7 +89,8 @@ class PayPingViewModel(
                 today = today,
                 defaultCurrencyCode = settings.defaultCurrencyCode
             ),
-            history = history
+            history = history,
+            customCategories = categories
         )
     }.stateIn(
         scope = viewModelScope,
@@ -118,7 +122,20 @@ class PayPingViewModel(
     fun saveReminder(reminder: PaymentReminder, onSaved: () -> Unit) {
         viewModelScope.launch {
             paymentRepository.upsertReminder(reminder)
+            settingsRepository.recordRecentCurrency(reminder.currencyCode)
             onSaved()
+        }
+    }
+
+    fun saveCategory(category: PaymentCategory) {
+        viewModelScope.launch {
+            paymentRepository.upsertCategory(category)
+        }
+    }
+
+    fun deleteCategory(uid: String) {
+        viewModelScope.launch {
+            paymentRepository.deleteCategory(uid)
         }
     }
 

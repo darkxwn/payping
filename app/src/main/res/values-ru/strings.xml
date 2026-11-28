@@ -156,4 +156,47 @@
     <string name="notification_title_in_days">Через %1$d дн.: %2$s</string>
     <string name="notification_body_amount">Сумма: %1$s</string>
     <string name="notification_body_with_note">Сумма: %1$s • %2$s</string>
+    <string name="notification_title_auto_today">Автосписание сегодня: %1$s</string>
+    <string name="notification_title_auto_tomorrow">Завтра автосписание: %1$s</string>
+    <string name="notification_title_auto_in_days">Автосписание через %1$d дн.: %2$s</string>
+    <string name="notification_body_auto_amount">Проверьте баланс • %1$s</string>
+    <string name="notification_body_auto_with_note">Проверьте баланс • %1$s • %2$s</string>
+    <string name="notification_title_trial_today">Заканчивается триал: %1$s</string>
+    <string name="notification_title_trial_tomorrow">Завтра закончится триал: %1$s</string>
+    <string name="notification_title_trial_in_days">Триал ещё %1$d дн.: %2$s</string>
+    <string name="notification_body_trial_amount">Успейте отменить до списания • %1$s</string>
+    <string name="notification_body_trial_with_note">Успейте отменить до списания • %1$s • %2$s</string>
+
+    <!-- Stage 1: Payment Types, Categories, Badges, Currency Catalog -->
+    <string name="field_payment_type_label">Тип списания</string>
+    <string name="payment_type_manual">Обычный</string>
+    <string name="payment_type_auto_debit">Авто</string>
+    <string name="payment_type_trial">Триал</string>
+    <string name="payment_type_installment">Рассрочка</string>
+
+    <string name="settings_categories">Категории</string>
+    <string name="field_category_label">Категория</string>
+    <string name="categories_builtin_section">Встроенные</string>
+    <string name="categories_custom_section">Мои категории</string>
+    <string name="action_create_category">Создать категорию</string>
+    <string name="dialog_category_create_title">Новая категория</string>
+    <string name="dialog_category_edit_title">Редактировать категорию</string>
+    <string name="category_name_label">Название</string>
+    <string name="category_icon_label">Иконка</string>
+    <string name="category_color_label">Цвет</string>
+    <string name="dialog_delete_category_title">Удалить категорию?</string>
+    <string name="dialog_delete_category_body">Списания и записи истории из «%1$s» перейдут в категорию «Другое».</string>
+
+    <string name="badge_picker_title">Значок списания</string>
+    <string name="badge_mode_monogram">Текст в кружке</string>
+    <string name="badge_mode_service">Иконка сервиса</string>
+    <string name="badge_monogram_label">Текст (1–2 символа или эмодзи)</string>
+    <string name="badge_service_search">Поиск сервиса или банка</string>
+    <string name="badge_color_label">Цвет кружка</string>
+
+    <string name="currency_picker_title">Валюта</string>
+    <string name="currency_search_placeholder">Поиск названия или кода (например, TRY)</string>
+    <string name="currency_recent_section">Основная и недавние</string>
+    <string name="currency_all_section">Все валюты</string>
+    <string name="currency_search_empty">Ничего не найдено</string>
 </resources>

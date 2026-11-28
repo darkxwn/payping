@@ -14,6 +14,7 @@ import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
 import com.darkxwn.payping.domain.model.BaseAccentColor
 import com.darkxwn.payping.domain.model.BottomBarStyle
+import com.darkxwn.payping.domain.model.CurrencyCatalog
 import com.darkxwn.payping.domain.model.CurrencyOption
 import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,7 @@ class SettingsRepository(private val context: Context) {
         val BOTTOM_BAR_STYLE = stringPreferencesKey("bottom_bar_style")
         val LIQUID_GLASS_LEVEL = stringPreferencesKey("liquid_glass_level")
         val DEFAULT_CURRENCY = stringPreferencesKey("default_currency")
+        val RECENT_CURRENCIES = stringPreferencesKey("recent_currencies")
     }
 
     val settings: Flow<AppSettings> = context.settingsDataStore.data.map { prefs ->
@@ -49,6 +51,7 @@ class SettingsRepository(private val context: Context) {
         val bottomBarStyle = enumOrDefault(prefs[Keys.BOTTOM_BAR_STYLE], BottomBarStyle.PINNED)
         val liquidGlassLevel = enumOrDefault(prefs[Keys.LIQUID_GLASS_LEVEL], LiquidGlassLevel.NONE)
         val currency = CurrencyOption.fromCode(prefs[Keys.DEFAULT_CURRENCY]).code
+        val recentCurrencies = decodeRecentCurrencies(prefs[Keys.RECENT_CURRENCIES])
 
         AppSettings(
             language = language,
@@ -60,7 +63,8 @@ class SettingsRepository(private val context: Context) {
             appFont = appFont,
             bottomBarStyle = bottomBarStyle,
             liquidGlassLevel = liquidGlassLevel,
-            defaultCurrencyCode = currency
+            defaultCurrencyCode = currency,
+            recentCurrencies = recentCurrencies
         )
     }
 
@@ -147,6 +151,16 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    suspend fun recordRecentCurrency(currencyCode: String) {
+        val validCode = CurrencyOption.fromCode(currencyCode).code
+        context.settingsDataStore.edit { prefs ->
+            val current = decodeRecentCurrencies(prefs[Keys.RECENT_CURRENCIES])
+            val updated = (listOf(validCode) + current.filterNot { it.equals(validCode, ignoreCase = true) })
+                .take(3)
+            prefs[Keys.RECENT_CURRENCIES] = updated.joinToString(",")
+        }
+    }
+
     suspend fun applyBackupSettings(imported: AppSettings) {
         context.settingsDataStore.edit { prefs ->
             prefs[Keys.LANGUAGE] = imported.language.tag ?: "system"
@@ -161,7 +175,22 @@ class SettingsRepository(private val context: Context) {
             prefs[Keys.BOTTOM_BAR_STYLE] = imported.bottomBarStyle.name
             prefs[Keys.LIQUID_GLASS_LEVEL] = imported.liquidGlassLevel.name
             prefs[Keys.DEFAULT_CURRENCY] = CurrencyOption.fromCode(imported.defaultCurrencyCode).code
+            prefs[Keys.RECENT_CURRENCIES] = imported.recentCurrencies
+                .filter(CurrencyCatalog::isSupported)
+                .map { CurrencyOption.fromCode(it).code }
+                .distinct()
+                .take(3)
+                .joinToString(",")
         }
+    }
+
+    private fun decodeRecentCurrencies(raw: String?): List<String> {
+        if (raw.isNullOrBlank()) return emptyList()
+        return raw.split(',')
+            .map { it.trim().uppercase() }
+            .filter(CurrencyCatalog::isSupported)
+            .distinct()
+            .take(3)
     }
 
     private fun decodeCustomColors(raw: String?): List<Long> {

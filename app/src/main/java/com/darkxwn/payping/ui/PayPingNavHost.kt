@@ -74,6 +74,7 @@ import com.darkxwn.payping.ui.components.LiquidGlassContainer
 import com.darkxwn.payping.ui.components.LocalHazeState
 import com.darkxwn.payping.ui.components.formatLocalDate
 import com.darkxwn.payping.ui.screens.AboutScreen
+import com.darkxwn.payping.ui.screens.CategoriesScreen
 import com.darkxwn.payping.ui.screens.DisclaimerScreen
 import com.darkxwn.payping.ui.screens.HistoryScreen
 import com.darkxwn.payping.ui.screens.ReminderEditScreen
@@ -106,6 +107,7 @@ private object EditorRoute {
 
 private object SettingsRoutes {
     const val THEME = "settings/theme"
+    const val CATEGORIES = "settings/categories"
     const val DISCLAIMER = "settings/disclaimer"
     const val ABOUT = "settings/about"
 }
@@ -293,6 +295,7 @@ fun PayPingAppScreen(
                                     language = settings.language,
                                     onDeleteItem = { id -> viewModel.deleteHistoryItem(id) },
                                     onClearAll = { viewModel.clearHistory() },
+                                    customCategories = uiState.customCategories,
                                     bottomBarClearance = floatingClearance
                                 )
                             }
@@ -306,6 +309,9 @@ fun PayPingAppScreen(
                                     onLanguageChange = { viewModel.setLanguage(it) },
                                     onOpenThemeSettings = {
                                         navController.navigate(SettingsRoutes.THEME)
+                                    },
+                                    onOpenCategories = {
+                                        navController.navigate(SettingsRoutes.CATEGORIES)
                                     },
                                     onDefaultCurrencyChange = { viewModel.setDefaultCurrency(it) },
                                     onRequestNotificationPermission = requestNotifications,
@@ -332,6 +338,17 @@ fun PayPingAppScreen(
                                         navController.navigate(SettingsRoutes.ABOUT)
                                     },
                                     bottomBarClearance = floatingClearance
+                                )
+                            }
+
+                            composable(SettingsRoutes.CATEGORIES) {
+                                CategoriesScreen(
+                                    customCategories = uiState.customCategories,
+                                    language = settings.language,
+                                    liquidGlassLevel = settings.liquidGlassLevel,
+                                    onSaveCategory = { viewModel.saveCategory(it) },
+                                    onDeleteCategory = { viewModel.deleteCategory(it) },
+                                    onNavigateBack = { navController.popBackStack() }
                                 )
                             }
 
@@ -389,7 +406,10 @@ fun PayPingAppScreen(
                                         }
                                     },
                                     onNavigateBack = { navController.popBackStack() },
-                                    liquidGlassLevel = settings.liquidGlassLevel
+                                    liquidGlassLevel = settings.liquidGlassLevel,
+                                    customCategories = uiState.customCategories,
+                                    recentCurrencyCodes = settings.recentCurrencies,
+                                    onSaveCategory = { viewModel.saveCategory(it) }
                                 )
                             }
                         }

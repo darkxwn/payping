@@ -16,6 +16,7 @@ import com.darkxwn.payping.R
 import com.darkxwn.payping.domain.logic.MoneyFormat
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.PaymentReminder
+import com.darkxwn.payping.domain.model.PaymentType
 import com.darkxwn.payping.ui.components.resolveSystemLanguageTag
 import java.util.Locale
 
@@ -63,16 +64,40 @@ object NotificationHelper {
         val notificationId = notificationId(reminder.id, daysBefore)
         val amountText = MoneyFormat.formatMinorAmount(reminder.amountMinor, reminder.currencyCode)
 
-        val title = when (daysBefore) {
-            0 -> localizedCtx.getString(R.string.notification_title_today, reminder.title)
-            1 -> localizedCtx.getString(R.string.notification_title_tomorrow, reminder.title)
-            else -> localizedCtx.getString(R.string.notification_title_in_days, daysBefore, reminder.title)
+        val title = when (reminder.paymentType) {
+            PaymentType.AUTO_DEBIT -> when (daysBefore) {
+                0 -> localizedCtx.getString(R.string.notification_title_auto_today, reminder.title)
+                1 -> localizedCtx.getString(R.string.notification_title_auto_tomorrow, reminder.title)
+                else -> localizedCtx.getString(R.string.notification_title_auto_in_days, daysBefore, reminder.title)
+            }
+            PaymentType.TRIAL -> when (daysBefore) {
+                0 -> localizedCtx.getString(R.string.notification_title_trial_today, reminder.title)
+                1 -> localizedCtx.getString(R.string.notification_title_trial_tomorrow, reminder.title)
+                else -> localizedCtx.getString(R.string.notification_title_trial_in_days, daysBefore, reminder.title)
+            }
+            PaymentType.MANUAL, PaymentType.INSTALLMENT -> when (daysBefore) {
+                0 -> localizedCtx.getString(R.string.notification_title_today, reminder.title)
+                1 -> localizedCtx.getString(R.string.notification_title_tomorrow, reminder.title)
+                else -> localizedCtx.getString(R.string.notification_title_in_days, daysBefore, reminder.title)
+            }
         }
 
-        val body = if (reminder.note.isNotBlank()) {
-            localizedCtx.getString(R.string.notification_body_with_note, amountText, reminder.note)
-        } else {
-            localizedCtx.getString(R.string.notification_body_amount, amountText)
+        val body = when (reminder.paymentType) {
+            PaymentType.AUTO_DEBIT -> if (reminder.note.isNotBlank()) {
+                localizedCtx.getString(R.string.notification_body_auto_with_note, amountText, reminder.note)
+            } else {
+                localizedCtx.getString(R.string.notification_body_auto_amount, amountText)
+            }
+            PaymentType.TRIAL -> if (reminder.note.isNotBlank()) {
+                localizedCtx.getString(R.string.notification_body_trial_with_note, amountText, reminder.note)
+            } else {
+                localizedCtx.getString(R.string.notification_body_trial_amount, amountText)
+            }
+            PaymentType.MANUAL, PaymentType.INSTALLMENT -> if (reminder.note.isNotBlank()) {
+                localizedCtx.getString(R.string.notification_body_with_note, amountText, reminder.note)
+            } else {
+                localizedCtx.getString(R.string.notification_body_amount, amountText)
+            }
         }
 
         val openIntent = Intent(context, MainActivity::class.java).apply {

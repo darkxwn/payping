@@ -57,12 +57,19 @@ import com.darkxwn.payping.domain.logic.CurrencyTotal
 import com.darkxwn.payping.domain.logic.MoneyFormat
 import com.darkxwn.payping.domain.logic.ReminderSummary
 import com.darkxwn.payping.domain.model.AppLanguage
+import com.darkxwn.payping.domain.model.CategoryCatalog
+import com.darkxwn.payping.domain.model.PaymentCategory
 import com.darkxwn.payping.domain.model.PaymentReminder
+import com.darkxwn.payping.domain.model.PaymentType
 import com.darkxwn.payping.domain.model.RecurrenceType
 import com.darkxwn.payping.ui.MainUiState
+import com.darkxwn.payping.ui.components.PaymentBadgeAvatar
 import com.darkxwn.payping.ui.components.formatLocalDate
+import com.darkxwn.payping.ui.components.legibleCategoryAccentColor
+import com.darkxwn.payping.ui.components.paymentTypeLabel
 import com.darkxwn.payping.ui.components.recurrenceLabel
 import com.darkxwn.payping.ui.components.remindDayChipLabel
+import com.darkxwn.payping.ui.components.resolveSystemLanguageTag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -150,6 +157,7 @@ fun RemindersScreen(
                     items(grouped.overdue, key = { "overdue_${it.id}" }) { reminder ->
                         ReminderCard(
                             reminder = reminder,
+                            customCategories = uiState.customCategories,
                             language = uiState.settings.language,
                             isOverdue = true,
                             isToday = false,
@@ -170,6 +178,7 @@ fun RemindersScreen(
                     items(grouped.today, key = { "today_${it.id}" }) { reminder ->
                         ReminderCard(
                             reminder = reminder,
+                            customCategories = uiState.customCategories,
                             language = uiState.settings.language,
                             isOverdue = false,
                             isToday = true,
@@ -190,6 +199,7 @@ fun RemindersScreen(
                     items(grouped.upcoming, key = { "upcoming_${it.id}" }) { reminder ->
                         ReminderCard(
                             reminder = reminder,
+                            customCategories = uiState.customCategories,
                             language = uiState.settings.language,
                             isOverdue = false,
                             isToday = false,
@@ -210,6 +220,7 @@ fun RemindersScreen(
                     items(grouped.later, key = { "later_${it.id}" }) { reminder ->
                         ReminderCard(
                             reminder = reminder,
+                            customCategories = uiState.customCategories,
                             language = uiState.settings.language,
                             isOverdue = false,
                             isToday = false,
@@ -414,6 +425,7 @@ private fun BucketSectionHeader(
 @Composable
 private fun ReminderCard(
     reminder: PaymentReminder,
+    customCategories: List<PaymentCategory>,
     language: AppLanguage,
     isOverdue: Boolean,
     isToday: Boolean,
@@ -425,6 +437,11 @@ private fun ReminderCard(
         isToday -> MaterialTheme.colorScheme.surfaceContainerHigh
         else -> MaterialTheme.colorScheme.surfaceContainerLow
     }
+    val langTag = androidx.compose.runtime.remember(language) {
+        language.resolvedLocaleTag(resolveSystemLanguageTag())
+    }
+    val category = CategoryCatalog.resolve(reminder.categoryUid, customCategories, langTag)
+    val categoryColor = legibleCategoryAccentColor(category.colorArgb)
 
     Card(
         onClick = onCardClick,
@@ -438,9 +455,16 @@ private fun ReminderCard(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                PaymentBadgeAvatar(
+                    title = reminder.title,
+                    badgeIconKey = reminder.badgeIconKey,
+                    badgeText = reminder.badgeText,
+                    badgeColorArgb = reminder.badgeColorArgb,
+                    size = 40.dp
+                )
+                Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = reminder.title,
@@ -518,6 +542,44 @@ private fun ReminderCard(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
+                        Surface(
+                            shape = MaterialTheme.shapes.small,
+                            color = Color(category.colorArgb).copy(alpha = 0.14f)
+                        ) {
+                            Text(
+                                text = category.name,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = categoryColor,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                            )
+                        }
+
+                        if (reminder.paymentType != PaymentType.MANUAL) {
+                            val typeBg = when (reminder.paymentType) {
+                                PaymentType.TRIAL -> MaterialTheme.colorScheme.tertiaryContainer
+                                else -> MaterialTheme.colorScheme.secondaryContainer
+                            }
+                            val typeFg = when (reminder.paymentType) {
+                                PaymentType.TRIAL -> MaterialTheme.colorScheme.onTertiaryContainer
+                                else -> MaterialTheme.colorScheme.onSecondaryContainer
+                            }
+                            Surface(
+                                shape = MaterialTheme.shapes.small,
+                                color = typeBg
+                            ) {
+                                Text(
+                                    text = paymentTypeLabel(reminder.paymentType),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = typeFg,
+                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+
                         reminder.remindDaysBefore.forEach { daysBefore ->
                             Surface(
                                 shape = MaterialTheme.shapes.small,

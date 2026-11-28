@@ -6,15 +6,20 @@ import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
 import com.darkxwn.payping.domain.model.BaseAccentColor
 import com.darkxwn.payping.domain.model.BottomBarStyle
+import com.darkxwn.payping.domain.model.BuiltInCategory
+import com.darkxwn.payping.domain.model.CurrencyCatalog
 import com.darkxwn.payping.domain.model.CurrencyOption
 import com.darkxwn.payping.domain.model.LiquidGlassLevel
+import com.darkxwn.payping.domain.model.PaymentCategory
 import com.darkxwn.payping.domain.model.PaymentHistory
 import com.darkxwn.payping.domain.model.PaymentReminder
+import com.darkxwn.payping.domain.model.PaymentType
 import com.darkxwn.payping.domain.model.RecurrenceType
 import com.darkxwn.payping.domain.model.ReminderConstants
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
+import java.util.UUID
 
 enum class ImportMode {
     REPLACE,
@@ -26,6 +31,7 @@ data class BackupPayload(
     val schemaVersion: Int = BackupSerializer.CURRENT_SCHEMA_VERSION,
     val exportedAtEpochMillis: Long,
     val settings: BackupSettingsDto? = null,
+    val categories: List<BackupCategoryDto> = emptyList(),
     val reminders: List<BackupReminderDto> = emptyList(),
     val history: List<BackupHistoryDto> = emptyList()
 )
@@ -41,11 +47,23 @@ data class BackupSettingsDto(
     val appFont: String? = null,
     val bottomBarStyle: String? = null,
     val liquidGlassLevel: String? = null,
-    val defaultCurrencyCode: String? = null
+    val defaultCurrencyCode: String? = null,
+    val recentCurrencies: List<String> = emptyList()
+)
+
+@Serializable
+data class BackupCategoryDto(
+    val uid: String,
+    val name: String,
+    val iconKey: String = "other",
+    val colorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
+    val sortOrder: Int = 0,
+    val createdAtEpochMillis: Long = 0L
 )
 
 @Serializable
 data class BackupReminderDto(
+    val uid: String? = null,
     val title: String,
     val amountMinor: Long,
     val currencyCode: String,
@@ -55,6 +73,16 @@ data class BackupReminderDto(
     val recurrence: String,
     val remindDaysBefore: List<Int> = listOf(0),
     val note: String = "",
+    val paymentType: String? = null,
+    val categoryUid: String? = null,
+    val badgeIconKey: String? = null,
+    val badgeText: String? = null,
+    val badgeColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
+    val isArchived: Boolean = false,
+    val isVariableAmount: Boolean = false,
+    val serviceLink: String = "",
+    val installmentPaid: Int? = null,
+    val installmentTotal: Int? = null,
     val anchorDayOfMonth: Int? = null,
     val createdAtEpochMillis: Long = 0L,
     val updatedAtEpochMillis: Long = 0L
@@ -62,24 +90,35 @@ data class BackupReminderDto(
 
 @Serializable
 data class BackupHistoryDto(
+    val uid: String? = null,
     val reminderId: Long? = null,
+    val reminderUid: String? = null,
     val title: String,
     val amountMinor: Long,
     val currencyCode: String,
     val dueDate: String,
     val paidAtEpochMillis: Long,
     val note: String = "",
-    val recurrence: String = RecurrenceType.ONCE.name
+    val recurrence: String = RecurrenceType.ONCE.name,
+    val paymentType: String? = null,
+    val categoryUid: String? = null,
+    val badgeIconKey: String? = null,
+    val badgeText: String? = null,
+    val badgeColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
+    val previousDueDate: String? = null,
+    val nextDueDateAfterPayment: String? = null,
+    val rateToUsd: Double? = null
 )
 
 data class DecodedBackup(
     val settings: AppSettings?,
+    val categories: List<PaymentCategory> = emptyList(),
     val reminders: List<PaymentReminder>,
     val history: List<PaymentHistory>
 )
 
 object BackupSerializer {
-    const val CURRENT_SCHEMA_VERSION = 1
+    const val CURRENT_SCHEMA_VERSION = 2
 
     private val json = Json {
         prettyPrint = true
@@ -91,6 +130,7 @@ object BackupSerializer {
         reminders: List<PaymentReminder>,
         history: List<PaymentHistory>,
         settings: AppSettings,
+        categories: List<PaymentCategory> = emptyList(),
         exportedAtEpochMillis: Long = System.currentTimeMillis()
     ): String {
         val payload = BackupPayload(
@@ -106,10 +146,25 @@ object BackupSerializer {
                 appFont = settings.appFont.name,
                 bottomBarStyle = settings.bottomBarStyle.name,
                 liquidGlassLevel = settings.liquidGlassLevel.name,
-                defaultCurrencyCode = settings.defaultCurrencyCode
+                defaultCurrencyCode = settings.defaultCurrencyCode,
+                recentCurrencies = settings.recentCurrencies
+                    .filter(CurrencyCatalog::isSupported)
+                    .distinct()
+                    .take(3)
             ),
+            categories = categories.filterNot { it.isBuiltIn }.map { category ->
+                BackupCategoryDto(
+                    uid = category.uid,
+                    name = category.name.trim(),
+                    iconKey = category.iconKey,
+                    colorArgb = BaseAccentColor.normalizeOpaqueArgb(category.colorArgb),
+                    sortOrder = category.sortOrder,
+                    createdAtEpochMillis = category.createdAtEpochMillis
+                )
+            },
             reminders = reminders.map { reminder ->
                 BackupReminderDto(
+                    uid = reminder.uid,
                     title = reminder.title,
                     amountMinor = reminder.amountMinor,
                     currencyCode = reminder.currencyCode,
@@ -119,6 +174,16 @@ object BackupSerializer {
                     recurrence = reminder.recurrence.name,
                     remindDaysBefore = reminder.remindDaysBefore,
                     note = reminder.note,
+                    paymentType = reminder.paymentType.name,
+                    categoryUid = reminder.categoryUid,
+                    badgeIconKey = reminder.badgeIconKey,
+                    badgeText = reminder.badgeText,
+                    badgeColorArgb = BaseAccentColor.normalizeOpaqueArgb(reminder.badgeColorArgb),
+                    isArchived = reminder.isArchived,
+                    isVariableAmount = reminder.isVariableAmount,
+                    serviceLink = reminder.serviceLink,
+                    installmentPaid = reminder.installmentPaid,
+                    installmentTotal = reminder.installmentTotal,
                     anchorDayOfMonth = reminder.anchorDayOfMonth,
                     createdAtEpochMillis = reminder.createdAtEpochMillis,
                     updatedAtEpochMillis = reminder.updatedAtEpochMillis
@@ -126,14 +191,24 @@ object BackupSerializer {
             },
             history = history.map { item ->
                 BackupHistoryDto(
+                    uid = item.uid,
                     reminderId = item.reminderId,
+                    reminderUid = item.reminderUid,
                     title = item.title,
                     amountMinor = item.amountMinor,
                     currencyCode = item.currencyCode,
                     dueDate = item.dueDate.toString(),
                     paidAtEpochMillis = item.paidAtEpochMillis,
                     note = item.note,
-                    recurrence = item.recurrence.name
+                    recurrence = item.recurrence.name,
+                    paymentType = item.paymentType.name,
+                    categoryUid = item.categoryUid,
+                    badgeIconKey = item.badgeIconKey,
+                    badgeText = item.badgeText,
+                    badgeColorArgb = BaseAccentColor.normalizeOpaqueArgb(item.badgeColorArgb),
+                    previousDueDate = item.previousDueDate?.toString(),
+                    nextDueDateAfterPayment = item.nextDueDateAfterPayment?.toString(),
+                    rateToUsd = item.rateToUsd
                 )
             }
         )
@@ -159,8 +234,30 @@ object BackupSerializer {
                 appFont = enumValueOrNull<AppFont>(dto.appFont) ?: AppFont.SYSTEM,
                 bottomBarStyle = enumValueOrNull<BottomBarStyle>(dto.bottomBarStyle) ?: BottomBarStyle.PINNED,
                 liquidGlassLevel = enumValueOrNull<LiquidGlassLevel>(dto.liquidGlassLevel) ?: LiquidGlassLevel.NONE,
-                defaultCurrencyCode = CurrencyOption.fromCode(dto.defaultCurrencyCode).code
+                defaultCurrencyCode = CurrencyOption.fromCode(dto.defaultCurrencyCode).code,
+                recentCurrencies = dto.recentCurrencies
+                    .map { CurrencyOption.fromCode(it).code }
+                    .distinct()
+                    .take(3)
             )
+        }
+
+        val parsedCategories = payload.categories.mapNotNull { dto ->
+            val trimmedName = dto.name.trim()
+            val trimmedUid = dto.uid.trim()
+            if (trimmedUid.isEmpty() || trimmedName.isEmpty()) {
+                null
+            } else {
+                PaymentCategory(
+                    uid = trimmedUid,
+                    name = trimmedName,
+                    iconKey = dto.iconKey.ifBlank { "other" },
+                    colorArgb = BaseAccentColor.normalizeOpaqueArgb(dto.colorArgb),
+                    isBuiltIn = false,
+                    sortOrder = dto.sortOrder,
+                    createdAtEpochMillis = dto.createdAtEpochMillis
+                )
+            }
         }
 
         val parsedReminders = payload.reminders.map { dto ->
@@ -178,6 +275,7 @@ object BackupSerializer {
 
             PaymentReminder(
                 id = 0L,
+                uid = dto.uid?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString(),
                 title = trimmedTitle,
                 amountMinor = dto.amountMinor,
                 currencyCode = CurrencyOption.fromCode(dto.currencyCode).code,
@@ -187,6 +285,16 @@ object BackupSerializer {
                 recurrence = recurrence,
                 remindDaysBefore = remindDays,
                 note = dto.note.trim(),
+                paymentType = PaymentType.fromRaw(dto.paymentType),
+                categoryUid = dto.categoryUid?.takeIf { it.isNotBlank() } ?: BuiltInCategory.OTHER.uid,
+                badgeIconKey = dto.badgeIconKey?.takeIf { it.isNotBlank() },
+                badgeText = dto.badgeText?.trim()?.takeIf { it.isNotBlank() },
+                badgeColorArgb = BaseAccentColor.normalizeOpaqueArgb(dto.badgeColorArgb),
+                isArchived = dto.isArchived,
+                isVariableAmount = dto.isVariableAmount,
+                serviceLink = dto.serviceLink.trim(),
+                installmentPaid = dto.installmentPaid,
+                installmentTotal = dto.installmentTotal,
                 anchorDayOfMonth = (dto.anchorDayOfMonth ?: dueDate.dayOfMonth).coerceIn(1, 31),
                 createdAtEpochMillis = dto.createdAtEpochMillis,
                 updatedAtEpochMillis = dto.updatedAtEpochMillis
@@ -202,19 +310,30 @@ object BackupSerializer {
 
             PaymentHistory(
                 id = 0L,
+                uid = dto.uid?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString(),
                 reminderId = dto.reminderId,
+                reminderUid = dto.reminderUid?.takeIf { it.isNotBlank() },
                 title = trimmedTitle,
                 amountMinor = dto.amountMinor,
                 currencyCode = CurrencyOption.fromCode(dto.currencyCode).code,
                 dueDate = dueDate,
                 paidAtEpochMillis = dto.paidAtEpochMillis,
                 note = dto.note.trim(),
-                recurrence = recurrence
+                recurrence = recurrence,
+                paymentType = PaymentType.fromRaw(dto.paymentType),
+                categoryUid = dto.categoryUid?.takeIf { it.isNotBlank() } ?: BuiltInCategory.OTHER.uid,
+                badgeIconKey = dto.badgeIconKey?.takeIf { it.isNotBlank() },
+                badgeText = dto.badgeText?.trim()?.takeIf { it.isNotBlank() },
+                badgeColorArgb = BaseAccentColor.normalizeOpaqueArgb(dto.badgeColorArgb),
+                previousDueDate = dto.previousDueDate?.takeIf { it.isNotBlank() }?.let(LocalDate::parse),
+                nextDueDateAfterPayment = dto.nextDueDateAfterPayment?.takeIf { it.isNotBlank() }?.let(LocalDate::parse),
+                rateToUsd = dto.rateToUsd
             )
         }
 
         DecodedBackup(
             settings = parsedSettings,
+            categories = parsedCategories,
             reminders = parsedReminders,
             history = parsedHistory
         )

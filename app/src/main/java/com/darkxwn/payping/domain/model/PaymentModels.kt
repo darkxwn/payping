@@ -2,6 +2,7 @@ package com.darkxwn.payping.domain.model
 
 import java.time.LocalDate
 import java.util.Locale
+import java.util.UUID
 
 enum class RecurrenceType {
     ONCE,
@@ -81,24 +82,6 @@ enum class AppLanguage(val tag: String?) {
     }
 }
 
-enum class CurrencyOption(val code: String, val symbol: String) {
-    RUB("RUB", "₽"),
-    USD("USD", "$"),
-    EUR("EUR", "€"),
-    GBP("GBP", "£"),
-    KZT("KZT", "₸"),
-    BYN("BYN", "Br"),
-    CNY("CNY", "¥");
-
-    companion object {
-        fun fromCode(code: String?): CurrencyOption =
-            entries.firstOrNull { it.code.equals(code, ignoreCase = true) } ?: RUB
-
-        fun symbolFor(code: String): String =
-            entries.firstOrNull { it.code.equals(code, ignoreCase = true) }?.symbol ?: code
-    }
-}
-
 object ReminderConstants {
     val SUPPORTED_REMIND_DAYS = listOf(0, 1, 2, 3, 5, 7, 14)
     val DEFAULT_REMIND_DAYS = listOf(0, 1, 3)
@@ -108,6 +91,7 @@ object ReminderConstants {
 
 data class PaymentReminder(
     val id: Long = 0L,
+    val uid: String = UUID.randomUUID().toString(),
     val title: String,
     val amountMinor: Long,
     val currencyCode: String,
@@ -117,6 +101,16 @@ data class PaymentReminder(
     val recurrence: RecurrenceType,
     val remindDaysBefore: List<Int>,
     val note: String = "",
+    val paymentType: PaymentType = PaymentType.MANUAL,
+    val categoryUid: String = BuiltInCategory.OTHER.uid,
+    val badgeIconKey: String? = null,
+    val badgeText: String? = null,
+    val badgeColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
+    val isArchived: Boolean = false,
+    val isVariableAmount: Boolean = false,
+    val serviceLink: String = "",
+    val installmentPaid: Int? = null,
+    val installmentTotal: Int? = null,
     val anchorDayOfMonth: Int = dueDate.dayOfMonth,
     val createdAtEpochMillis: Long = 0L,
     val updatedAtEpochMillis: Long = 0L
@@ -124,14 +118,24 @@ data class PaymentReminder(
 
 data class PaymentHistory(
     val id: Long = 0L,
+    val uid: String = UUID.randomUUID().toString(),
     val reminderId: Long?,
+    val reminderUid: String? = null,
     val title: String,
     val amountMinor: Long,
     val currencyCode: String,
     val dueDate: LocalDate,
     val paidAtEpochMillis: Long,
     val note: String = "",
-    val recurrence: RecurrenceType = RecurrenceType.ONCE
+    val recurrence: RecurrenceType = RecurrenceType.ONCE,
+    val paymentType: PaymentType = PaymentType.MANUAL,
+    val categoryUid: String = BuiltInCategory.OTHER.uid,
+    val badgeIconKey: String? = null,
+    val badgeText: String? = null,
+    val badgeColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
+    val previousDueDate: LocalDate? = null,
+    val nextDueDateAfterPayment: LocalDate? = null,
+    val rateToUsd: Double? = null
 )
 
 data class AppSettings(
@@ -144,5 +148,6 @@ data class AppSettings(
     val appFont: AppFont = AppFont.SYSTEM,
     val bottomBarStyle: BottomBarStyle = BottomBarStyle.PINNED,
     val liquidGlassLevel: LiquidGlassLevel = LiquidGlassLevel.NONE,
-    val defaultCurrencyCode: String = CurrencyOption.RUB.code
+    val defaultCurrencyCode: String = CurrencyOption.RUB.code,
+    val recentCurrencies: List<String> = emptyList()
 )

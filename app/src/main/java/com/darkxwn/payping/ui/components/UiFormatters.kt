@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.darkxwn.payping.R
 import com.darkxwn.payping.domain.model.AppLanguage
+import com.darkxwn.payping.domain.model.PaymentType
 import com.darkxwn.payping.domain.model.RecurrenceType
 import java.time.Instant
 import java.time.LocalDate
@@ -11,6 +12,14 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+
+@Composable
+fun paymentTypeLabel(paymentType: PaymentType): String = when (paymentType) {
+    PaymentType.MANUAL -> stringResource(R.string.payment_type_manual)
+    PaymentType.AUTO_DEBIT -> stringResource(R.string.payment_type_auto_debit)
+    PaymentType.TRIAL -> stringResource(R.string.payment_type_trial)
+    PaymentType.INSTALLMENT -> stringResource(R.string.payment_type_installment)
+}
 
 @Composable
 fun recurrenceLabel(recurrence: RecurrenceType): String = when (recurrence) {

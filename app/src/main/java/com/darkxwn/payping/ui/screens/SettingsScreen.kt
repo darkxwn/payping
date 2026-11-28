@@ -4,8 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +11,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.rounded.Category
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Download
@@ -30,6 +28,7 @@ import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material3.AlertDialog
@@ -38,7 +37,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -70,9 +68,10 @@ import com.darkxwn.payping.domain.backup.ImportMode
 import com.darkxwn.payping.domain.model.AppLanguage
 import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.CurrencyOption
+import com.darkxwn.payping.ui.components.CurrencyPickerSheet
 import com.darkxwn.payping.ui.components.resolveSystemLanguageTag
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     settings: AppSettings,
@@ -81,6 +80,7 @@ fun SettingsScreen(
     pendingImportJson: String?,
     onLanguageChange: (AppLanguage) -> Unit,
     onOpenThemeSettings: () -> Unit,
+    onOpenCategories: () -> Unit,
     onDefaultCurrencyChange: (String) -> Unit,
     onRequestNotificationPermission: () -> Unit,
     onOpenExactAlarmSettings: () -> Unit,
@@ -94,6 +94,10 @@ fun SettingsScreen(
     modifier: Modifier = Modifier
 ) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
+    var showCurrencyPicker by remember { mutableStateOf(false) }
+    val defaultCurrencySpec = remember(settings.defaultCurrencyCode) {
+        CurrencyOption.fromCode(settings.defaultCurrencyCode)
+    }
     val systemLanguageTag = remember { resolveSystemLanguageTag() }
     val systemLanguageName = if (AppLanguage.SYSTEM.resolvedLocaleTag(systemLanguageTag) == "ru") {
         stringResource(R.string.language_ru)
@@ -233,30 +237,49 @@ fun SettingsScreen(
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
 
-                    Column(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .clickable(role = Role.Button) { showCurrencyPicker = true }
+                            .padding(horizontal = 16.dp, vertical = 15.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Payments,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(14.dp))
                         Text(
                             text = stringResource(R.string.settings_default_currency),
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.weight(1f)
                         )
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            CurrencyOption.entries.forEach { option ->
-                                FilterChip(
-                                    selected = settings.defaultCurrencyCode == option.code,
-                                    onClick = { onDefaultCurrencyChange(option.code) },
-                                    label = { Text("${option.symbol} ${option.code}") }
-                                )
-                            }
-                        }
+                        Text(
+                            text = "${defaultCurrencySpec.symbol} ${defaultCurrencySpec.code}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Rounded.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
+
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    SettingsNavigationRow(
+                        icon = Icons.Rounded.Category,
+                        title = stringResource(R.string.settings_categories),
+                        onClick = onOpenCategories
+                    )
                 }
             }
 
@@ -395,6 +418,17 @@ fun SettingsScreen(
                     Text(stringResource(R.string.action_cancel))
                 }
             }
+        )
+    }
+
+    if (showCurrencyPicker) {
+        CurrencyPickerSheet(
+            selectedCurrencyCode = settings.defaultCurrencyCode,
+            defaultCurrencyCode = settings.defaultCurrencyCode,
+            recentCurrencyCodes = settings.recentCurrencies,
+            language = settings.language,
+            onSelectCurrency = onDefaultCurrencyChange,
+            onDismiss = { showCurrencyPicker = false }
         )
     }
 }

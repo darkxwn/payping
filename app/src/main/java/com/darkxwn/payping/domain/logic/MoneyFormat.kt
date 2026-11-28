@@ -1,5 +1,6 @@
 package com.darkxwn.payping.domain.logic
 
+import com.darkxwn.payping.domain.model.CurrencyCatalog
 import com.darkxwn.payping.domain.model.CurrencyOption
 import java.math.BigDecimal
 import java.text.DecimalFormat
@@ -9,7 +10,7 @@ import java.util.Locale
 object MoneyFormat {
     private const val MAX_MINOR_AMOUNT = 999_999_999_99L
 
-    fun parseAmountToMinor(raw: String): Long? {
+    fun parseAmountToMinor(raw: String, currencyCode: String = "RUB"): Long? {
         val cleaned = raw
             .replace("\u00A0", "")
             .replace(" ", "")
@@ -17,10 +18,12 @@ object MoneyFormat {
             .replace(',', '.')
 
         if (cleaned.isEmpty()) return null
-        if (!Regex("^\\d+(\\.\\d{1,2})?$").matches(cleaned)) return null
+        val scale = CurrencyCatalog.fromCode(currencyCode).decimalDigits
+        val pattern = if (scale == 0) Regex("^\\d+$") else Regex("^\\d+(\\.\\d{1,2})?$")
+        if (!pattern.matches(cleaned)) return null
 
         return try {
-            val minor = BigDecimal(cleaned).movePointRight(2).longValueExact()
+            val minor = BigDecimal(cleaned).movePointRight(scale).longValueExact()
             if (minor in 1..MAX_MINOR_AMOUNT) minor else null
         } catch (_: ArithmeticException) {
             null
@@ -30,28 +33,38 @@ object MoneyFormat {
     }
 
     fun formatMinorAmount(amountMinor: Long, currencyCode: String): String {
+        val scale = CurrencyCatalog.fromCode(currencyCode).decimalDigits
         val absMinor = kotlin.math.abs(amountMinor)
-        val whole = absMinor / 100
-        val fraction = (absMinor % 100).toInt()
         val symbols = DecimalFormatSymbols(Locale.US).apply {
             groupingSeparator = ' '
             decimalSeparator = '.'
         }
         val integerFormatter = DecimalFormat("#,##0", symbols)
-        val integerPart = integerFormatter.format(whole)
         val sign = if (amountMinor < 0) "-" else ""
-        val numberPart = if (fraction == 0) {
+
+        val numberPart = if (scale == 0) {
+            val integerPart = integerFormatter.format(absMinor)
             "$sign$integerPart"
         } else {
-            val fracStr = fraction.toString().padStart(2, '0')
-            "$sign$integerPart.$fracStr"
+            val whole = absMinor / 100
+            val fraction = (absMinor % 100).toInt()
+            val integerPart = integerFormatter.format(whole)
+            if (fraction == 0) {
+                "$sign$integerPart"
+            } else {
+                val fracStr = fraction.toString().padStart(2, '0')
+                "$sign$integerPart.$fracStr"
+            }
         }
         val symbol = CurrencyOption.symbolFor(currencyCode)
         return "$numberPart $symbol"
     }
 
-    fun minorToEditableInput(amountMinor: Long): String {
+    fun minorToEditableInput(amountMinor: Long, currencyCode: String = "RUB"): String {
         if (amountMinor <= 0) return ""
+        val scale = CurrencyCatalog.fromCode(currencyCode).decimalDigits
+        if (scale == 0) return amountMinor.toString()
+
         val whole = amountMinor / 100
         val fraction = (amountMinor % 100).toInt()
         return if (fraction == 0) {
