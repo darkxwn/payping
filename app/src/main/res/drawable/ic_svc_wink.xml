@@ -1,31 +1,13 @@
-<!-- Source: LawnchairLauncher/lawnicons (wink.svg), Apache-2.0 License -->
+<!-- Source: LawnchairLauncher/lawnicons (wink_tv.svg), Apache-2.0 License -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="192"
     android:viewportHeight="192">
     <path
-        android:pathData="M23 89s25 47 73 47 73-47 73-47"
+        android:pathData="M154.22 100.279a6.033 6.033 0 0 0 0-8.557L86.897 24.76a6.054 6.054 0 0 0-8.535 0L45.78 57.167a6.033 6.033 0 0 0-.128 8.426L74.425 96l-28.773 30.407a6.033 6.033 0 0 0 .128 8.426l32.582 32.407a6.053 6.053 0 0 0 8.535 0z"
         android:strokeColor="#FFFFFFFF"
         android:strokeWidth="14"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
-    <path
-        android:pathData="M58 64s6 12 19 12"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="12"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
-    <path
-        android:pathData="M109,70a6,6 0 1,0 12,0a6,6 0 1,0 -12,0Z"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="12"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
-    <path
-        android:pathData="M71,70a6,6 0 1,0 12,0a6,6 0 1,0 -12,0Z"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="12"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
 </vector>

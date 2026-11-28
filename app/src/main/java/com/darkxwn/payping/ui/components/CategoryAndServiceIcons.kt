@@ -26,11 +26,14 @@ import androidx.compose.material.icons.rounded.LiveTv
 import androidx.compose.material.icons.rounded.LocalCafe
 import androidx.compose.material.icons.rounded.LocalGasStation
 import androidx.compose.material.icons.rounded.LocalGroceryStore
+import androidx.compose.material.icons.rounded.LocalParking
 import androidx.compose.material.icons.rounded.LocalPharmacy
+import androidx.compose.material.icons.rounded.LocalShipping
 import androidx.compose.material.icons.rounded.MedicalServices
 import androidx.compose.material.icons.rounded.MenuBook
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Pets
+import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.Restaurant
 import androidx.compose.material.icons.rounded.Savings
 import androidx.compose.material.icons.rounded.School
@@ -99,6 +102,9 @@ fun categoryIconFor(iconKey: String): ImageVector = when (iconKey) {
     "savings" -> Icons.Rounded.Savings
     "insurance" -> Icons.Rounded.Security
     "investments" -> Icons.Rounded.TrendingUp
+    "parking" -> Icons.Rounded.LocalParking
+    "delivery" -> Icons.Rounded.LocalShipping
+    "photo" -> Icons.Rounded.PhotoCamera
     else -> Icons.Rounded.Category
 }
 
@@ -112,13 +118,10 @@ fun serviceDrawableResOrNull(iconKey: String): Int? = when (iconKey) {
     "gazprombank" -> R.drawable.ic_svc_gazprombank
     "raiffeisen" -> R.drawable.ic_svc_raiffeisen
     "yoomoney" -> R.drawable.ic_svc_yoomoney
-    "mir_pay" -> R.drawable.ic_svc_mir_pay
     "telegram" -> R.drawable.ic_svc_telegram
     "vk" -> R.drawable.ic_svc_vk
     "ozon" -> R.drawable.ic_svc_ozon
     "wb" -> R.drawable.ic_svc_wb
-    "avito" -> R.drawable.ic_svc_avito
-    "gosuslugi" -> R.drawable.ic_svc_gosuslugi
     "mts" -> R.drawable.ic_svc_mts
     "megafon" -> R.drawable.ic_svc_megafon
     "beeline" -> R.drawable.ic_svc_beeline

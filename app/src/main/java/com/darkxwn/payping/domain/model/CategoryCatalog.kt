@@ -91,6 +91,9 @@ object CategoryCatalog {
         "savings",
         "insurance",
         "investments",
+        "parking",
+        "delivery",
+        "photo",
         "other"
     )
 
@@ -103,7 +106,6 @@ object CategoryCatalog {
         0xFFC62828L,
         0xFFB45309L,
         0xFF2E7D32L,
-        0xFF00838FL,
         0xFF546E7AL
     )
 
@@ -154,13 +156,10 @@ object ServiceBadgeCatalog {
         ServicePresetSpec("gazprombank", "Газпромбанк", "Gazprombank", 0xFF1A4B8CL),
         ServicePresetSpec("raiffeisen", "Райффайзен", "Raiffeisen", 0xFFFEE600L),
         ServicePresetSpec("yoomoney", "ЮMoney", "YooMoney", 0xFF8B3FFDL),
-        ServicePresetSpec("mir_pay", "Mir Pay", "Mir Pay", 0xFF198754L),
         ServicePresetSpec("telegram", "Telegram", "Telegram", 0xFF229ED9L),
         ServicePresetSpec("vk", "VK", "VK", 0xFF0077FFL),
         ServicePresetSpec("ozon", "Ozon", "Ozon", 0xFF005BFFL),
         ServicePresetSpec("wb", "Wildberries", "Wildberries", 0xFF8E24AAL),
-        ServicePresetSpec("avito", "Авито", "Avito", 0xFF00AAFFL),
-        ServicePresetSpec("gosuslugi", "Госуслуги", "Gosuslugi", 0xFF0D4CD3L),
         ServicePresetSpec("mts", "МТС", "MTS", 0xFFE30611L),
         ServicePresetSpec("megafon", "МегаФон", "MegaFon", 0xFF00B956L),
         ServicePresetSpec("beeline", "Билайн", "Beeline", 0xFFFFCC00L),

@@ -374,8 +374,8 @@ fun CategoryEditorDialog(
                 )
 
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     colorChoices.forEach { argb ->
                         ColorCircleOption(
@@ -647,8 +647,8 @@ fun ServiceBadgePickerSheet(
                     fontWeight = FontWeight.SemiBold
                 )
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     badgeColorChoices.forEach { argb ->
                         ColorCircleOption(
@@ -699,7 +699,7 @@ private fun AddCustomColorOption(
 ) {
     Box(
         modifier = Modifier
-            .size(34.dp)
+            .size(40.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
@@ -710,7 +710,7 @@ private fun AddCustomColorOption(
             imageVector = Icons.Rounded.Add,
             contentDescription = stringResource(R.string.color_picker_title),
             tint = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(20.dp)
         )
     }
 }
@@ -725,7 +725,7 @@ private fun ColorCircleOption(
     val checkTint = if (swatchColor.luminance() > 0.55f) Color(0xFF111413) else Color.White
     Box(
         modifier = Modifier
-            .size(34.dp)
+            .size(40.dp)
             .clip(CircleShape)
             .border(
                 width = if (selected) 2.5.dp else 1.dp,
@@ -743,7 +743,7 @@ private fun ColorCircleOption(
                 imageVector = Icons.Rounded.Check,
                 contentDescription = null,
                 tint = checkTint,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(18.dp)
             )
         }
     }
