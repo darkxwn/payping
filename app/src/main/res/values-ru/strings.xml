@@ -98,6 +98,10 @@
     <string name="font_roboto">Roboto</string>
     <string name="font_inter">Inter</string>
     <string name="font_consolas">Consolas</string>
+    <string name="theme_section_font_scale">Масштаб текста</string>
+    <string name="font_scale_system">Как в системе</string>
+    <string name="font_scale_custom">Вручную</string>
+    <string name="font_scale_size_label">Размер</string>
     <string name="color_picker_title">Свой цвет</string>
     <string name="color_picker_hex_label">HEX-код</string>
     <string name="color_picker_add">Добавить</string>

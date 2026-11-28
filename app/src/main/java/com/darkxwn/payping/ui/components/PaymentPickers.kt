@@ -64,6 +64,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.darkxwn.payping.R
 import com.darkxwn.payping.domain.model.AppLanguage
@@ -335,34 +336,59 @@ fun CategoryEditorDialog(
                     fontWeight = FontWeight.SemiBold
                 )
 
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    CategoryCatalog.CATEGORY_ICON_KEYS.forEach { key ->
-                        val isSelected = key == iconKey
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    if (isSelected) Color(colorArgb).copy(alpha = 0.22f)
-                                    else MaterialTheme.colorScheme.surfaceContainerHigh
-                                )
-                                .border(
-                                    width = if (isSelected) 2.dp else 1.dp,
-                                    color = if (isSelected) Color(colorArgb) else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-                                    shape = CircleShape
-                                )
-                                .clickable(role = Role.Button) { iconKey = key },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = categoryIconFor(key),
-                                contentDescription = null,
-                                tint = if (isSelected) legibleCategoryAccentColor(colorArgb) else MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(20.dp)
-                            )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 176.dp)
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 8.dp, vertical = 10.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        CategoryCatalog.CATEGORY_ICON_KEYS.chunked(6).forEach { rowKeys ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                rowKeys.forEach { key ->
+                                    val isSelected = key == iconKey
+                                    Box(
+                                        modifier = Modifier.weight(1f),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clip(CircleShape)
+                                                .background(
+                                                    if (isSelected) Color(colorArgb).copy(alpha = 0.22f)
+                                                    else MaterialTheme.colorScheme.surfaceContainerHigh
+                                                )
+                                                .border(
+                                                    width = if (isSelected) 2.dp else 1.dp,
+                                                    color = if (isSelected) Color(colorArgb) else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                                                    shape = CircleShape
+                                                )
+                                                .clickable(role = Role.Button) { iconKey = key },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = categoryIconFor(key),
+                                                contentDescription = null,
+                                                tint = if (isSelected) legibleCategoryAccentColor(colorArgb) else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                                repeat(6 - rowKeys.size) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
                         }
                     }
                 }
@@ -373,18 +399,43 @@ fun CategoryEditorDialog(
                     fontWeight = FontWeight.SemiBold
                 )
 
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                val colorItems = colorChoices.map<Long, Long?> { it } + null
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    colorChoices.forEach { argb ->
-                        ColorCircleOption(
-                            argb = argb,
-                            selected = colorArgb == argb,
-                            onClick = { colorArgb = argb }
-                        )
+                    colorItems.chunked(6).forEach { rowColors ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            rowColors.forEach { argb ->
+                                Box(
+                                    modifier = Modifier.weight(1f),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (argb != null) {
+                                        ColorCircleOption(
+                                            argb = argb,
+                                            selected = colorArgb == argb,
+                                            size = 36.dp,
+                                            onClick = { colorArgb = argb }
+                                        )
+                                    } else {
+                                        AddCustomColorOption(
+                                            size = 36.dp,
+                                            onClick = { showCustomColorPicker = true }
+                                        )
+                                    }
+                                }
+                            }
+                            repeat(6 - rowColors.size) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
                     }
-                    AddCustomColorOption(onClick = { showCustomColorPicker = true })
                 }
             }
         },
@@ -695,11 +746,12 @@ fun ServiceBadgePickerSheet(
 
 @Composable
 private fun AddCustomColorOption(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    size: Dp = 40.dp
 ) {
     Box(
         modifier = Modifier
-            .size(40.dp)
+            .size(size)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
@@ -710,7 +762,7 @@ private fun AddCustomColorOption(
             imageVector = Icons.Rounded.Add,
             contentDescription = stringResource(R.string.color_picker_title),
             tint = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(size * 0.5f)
         )
     }
 }
@@ -719,13 +771,14 @@ private fun AddCustomColorOption(
 private fun ColorCircleOption(
     argb: Long,
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    size: Dp = 40.dp
 ) {
     val swatchColor = Color(argb)
     val checkTint = if (swatchColor.luminance() > 0.55f) Color(0xFF111413) else Color.White
     Box(
         modifier = Modifier
-            .size(40.dp)
+            .size(size)
             .clip(CircleShape)
             .border(
                 width = if (selected) 2.5.dp else 1.dp,
@@ -743,7 +796,7 @@ private fun ColorCircleOption(
                 imageVector = Icons.Rounded.Check,
                 contentDescription = null,
                 tint = checkTint,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(size * 0.45f)
             )
         }
     }

@@ -33,9 +33,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -60,6 +63,7 @@ import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import com.darkxwn.payping.ui.components.ColorPickerDialog
 import com.darkxwn.payping.ui.components.PayPingSubmenuScreen
 import com.darkxwn.payping.ui.theme.fontFamilyFor
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -72,6 +76,8 @@ fun ThemeSettingsScreen(
     onAddCustomAccentColor: (Long) -> Unit,
     onRemoveCustomAccentColor: (Long) -> Unit,
     onAppFontChange: (AppFont) -> Unit,
+    onUseSystemFontScaleChange: (Boolean) -> Unit,
+    onFontScalePercentChange: (Int) -> Unit,
     onBottomBarStyleChange: (BottomBarStyle) -> Unit,
     onLiquidGlassLevelChange: (LiquidGlassLevel) -> Unit,
     onNavigateBack: () -> Unit,
@@ -256,6 +262,115 @@ fun ThemeSettingsScreen(
                                     fontMenuExpanded = false
                                     onAppFontChange(option)
                                 }
+                            )
+                        }
+                    }
+                }
+            }
+
+            ExternalSectionTitle(stringResource(R.string.theme_section_font_scale))
+            ThemeOptionCard {
+                val systemPercent = (LocalDensity.current.fontScale * 100f).roundToInt()
+                var sliderPercent by remember(settings.fontScalePercent) {
+                    mutableFloatStateOf(settings.fontScalePercent.coerceIn(80, 140).toFloat())
+                }
+                val displayedPercent = if (settings.useSystemFontScale) {
+                    systemPercent
+                } else {
+                    sliderPercent.roundToInt()
+                }
+                val scaleOptions = listOf(
+                    true to R.string.font_scale_system,
+                    false to R.string.font_scale_custom
+                )
+
+                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        scaleOptions.forEachIndexed { index, (useSystem, labelRes) ->
+                            SegmentedButton(
+                                selected = settings.useSystemFontScale == useSystem,
+                                onClick = { onUseSystemFontScaleChange(useSystem) },
+                                shape = SegmentedButtonDefaults.itemShape(index = index, count = scaleOptions.size),
+                                icon = {}
+                            ) {
+                                Text(
+                                    text = stringResource(labelRes),
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                            }
+                        }
+                    }
+
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.font_scale_size_label),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (settings.useSystemFontScale) {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface
+                                }
+                            )
+                            Text(
+                                text = "$displayedPercent%",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (settings.useSystemFontScale) {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                } else {
+                                    MaterialTheme.colorScheme.primary
+                                }
+                            )
+                        }
+
+                        Slider(
+                            value = if (settings.useSystemFontScale) {
+                                systemPercent.toFloat().coerceIn(80f, 140f)
+                            } else {
+                                sliderPercent.coerceIn(80f, 140f)
+                            },
+                            onValueChange = { raw ->
+                                val snapped = (((raw - 80f) / 5f).roundToInt() * 5 + 80).coerceIn(80, 140)
+                                sliderPercent = snapped.toFloat()
+                            },
+                            onValueChangeFinished = {
+                                val target = sliderPercent.roundToInt().coerceIn(80, 140)
+                                if (target != settings.fontScalePercent) {
+                                    onFontScalePercentChange(target)
+                                }
+                            },
+                            enabled = !settings.useSystemFontScale,
+                            valueRange = 80f..140f,
+                            steps = 11,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "80%",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "110%",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "140%",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }

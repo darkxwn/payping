@@ -21,6 +21,8 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DeleteSweep
+import androidx.compose.material.icons.rounded.Event
+import androidx.compose.material.icons.rounded.EventRepeat
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -230,123 +232,178 @@ private fun HistoryCard(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 14.dp, top = 12.dp, bottom = 12.dp, end = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            PaymentBadgeAvatar(
-                title = item.title,
-                badgeIconKey = item.badgeIconKey,
-                badgeText = item.badgeText,
-                badgeColorArgb = item.badgeColorArgb,
-                size = 40.dp
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 8.dp),
+                verticalAlignment = Alignment.Top
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = MoneyFormat.formatMinorAmount(item.amountMinor, item.currencyCode),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                Text(
-                    text = stringResource(
-                        R.string.history_paid_at,
-                        formatDateTimeMillis(item.paidAtEpochMillis, language)
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                PaymentBadgeAvatar(
+                    title = item.title,
+                    badgeIconKey = item.badgeIconKey,
+                    badgeText = item.badgeText,
+                    badgeColorArgb = item.badgeColorArgb,
+                    size = 40.dp,
+                    modifier = Modifier.padding(top = 2.dp)
                 )
-                Text(
-                    text = "${stringResource(R.string.history_due_date, formatLocalDate(item.dueDate, language))} • ${recurrenceLabel(item.recurrence)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    if (item.paymentType != PaymentType.MANUAL) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Text(
+                            text = item.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = MoneyFormat.formatMinorAmount(item.amountMinor, item.currencyCode),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        val typeBg = when (item.paymentType) {
+                            PaymentType.TRIAL -> MaterialTheme.colorScheme.tertiaryContainer
+                            PaymentType.AUTO_DEBIT -> MaterialTheme.colorScheme.secondaryContainer
+                            else -> MaterialTheme.colorScheme.surfaceContainerHighest
+                        }
+                        val typeFg = when (item.paymentType) {
+                            PaymentType.TRIAL -> MaterialTheme.colorScheme.onTertiaryContainer
+                            PaymentType.AUTO_DEBIT -> MaterialTheme.colorScheme.onSecondaryContainer
+                            else -> MaterialTheme.colorScheme.onSurfaceVariant
+                        }
                         Surface(
                             shape = MaterialTheme.shapes.small,
-                            color = if (item.paymentType == PaymentType.TRIAL) {
-                                MaterialTheme.colorScheme.tertiaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.secondaryContainer
-                            }
+                            color = typeBg
                         ) {
                             Text(
                                 text = paymentTypeLabel(item.paymentType),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.SemiBold,
-                                color = if (item.paymentType == PaymentType.TRIAL) {
-                                    MaterialTheme.colorScheme.onTertiaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.onSecondaryContainer
-                                },
+                                color = typeFg,
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                            )
+                        }
+                        Surface(
+                            shape = MaterialTheme.shapes.small,
+                            color = Color(category.colorArgb).copy(alpha = 0.14f)
+                        ) {
+                            Text(
+                                text = category.name,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = categoryColor,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
                             )
                         }
                     }
-                    Surface(
-                        shape = MaterialTheme.shapes.small,
-                        color = Color(category.colorArgb).copy(alpha = 0.14f)
-                    ) {
-                        Text(
-                            text = category.name,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = categoryColor,
-                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
-                        )
-                    }
-                }
-                if (item.note.isNotBlank()) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Rounded.CreditCard,
-                            contentDescription = null,
-                            modifier = Modifier.size(13.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = item.note,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+
+                    if (item.note.isNotBlank()) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.CreditCard,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = item.note,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
             }
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = Icons.Rounded.Delete,
-                    contentDescription = stringResource(R.string.action_delete),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    HistoryMetaBadge(
+                        icon = Icons.Rounded.CheckCircle,
+                        text = stringResource(
+                            R.string.history_paid_at,
+                            formatDateTimeMillis(item.paidAtEpochMillis, language)
+                        )
+                    )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        HistoryMetaBadge(
+                            icon = Icons.Rounded.Event,
+                            text = stringResource(
+                                R.string.history_due_date,
+                                formatLocalDate(item.dueDate, language)
+                            )
+                        )
+                        HistoryMetaBadge(
+                            icon = Icons.Rounded.EventRepeat,
+                            text = recurrenceLabel(item.recurrence)
+                        )
+                    }
+                }
+
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = stringResource(R.string.action_delete),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun HistoryMetaBadge(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(14.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

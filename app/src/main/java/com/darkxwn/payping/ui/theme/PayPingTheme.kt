@@ -18,11 +18,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.darkxwn.payping.R
@@ -169,10 +171,21 @@ fun PayPingTheme(
     useDynamicColor: Boolean = false,
     accentColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
     appFont: AppFont = AppFont.SYSTEM,
+    useSystemFontScale: Boolean = true,
+    fontScalePercent: Int = 100,
     content: @Composable () -> Unit
 ) {
     val useDark = isPayPingDarkTheme(themeMode)
     val context = LocalContext.current
+    val baseDensity = LocalDensity.current
+    val appliedDensity = if (useSystemFontScale) {
+        baseDensity
+    } else {
+        Density(
+            density = baseDensity.density,
+            fontScale = fontScalePercent.coerceIn(80, 140) / 100f
+        )
+    }
 
     val baseScheme = if (useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         if (useDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -192,13 +205,15 @@ fun PayPingTheme(
         buildTypography(fontFamilyFor(appFont))
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = typography,
-        shapes = PayPingShapes
-    ) {
-        CompositionLocalProvider(LocalContentColor provides colorScheme.onBackground) {
-            content()
+    CompositionLocalProvider(LocalDensity provides appliedDensity) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = typography,
+            shapes = PayPingShapes
+        ) {
+            CompositionLocalProvider(LocalContentColor provides colorScheme.onBackground) {
+                content()
+            }
         }
     }
 }

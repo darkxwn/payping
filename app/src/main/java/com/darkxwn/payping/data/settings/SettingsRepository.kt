@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -33,6 +34,8 @@ class SettingsRepository(private val context: Context) {
         val ACCENT_COLOR_ARGB = longPreferencesKey("accent_color_argb")
         val CUSTOM_ACCENT_COLORS = stringPreferencesKey("custom_accent_colors")
         val APP_FONT = stringPreferencesKey("app_font")
+        val USE_SYSTEM_FONT_SCALE = booleanPreferencesKey("use_system_font_scale")
+        val FONT_SCALE_PERCENT = intPreferencesKey("font_scale_percent")
         val BOTTOM_BAR_STYLE = stringPreferencesKey("bottom_bar_style")
         val LIQUID_GLASS_LEVEL = stringPreferencesKey("liquid_glass_level")
         val DEFAULT_CURRENCY = stringPreferencesKey("default_currency")
@@ -48,6 +51,8 @@ class SettingsRepository(private val context: Context) {
             ?: BaseAccentColor.DEFAULT_ARGB
         val customColors = decodeCustomColors(prefs[Keys.CUSTOM_ACCENT_COLORS])
         val appFont = enumOrDefault(prefs[Keys.APP_FONT], AppFont.SYSTEM)
+        val useSystemFontScale = prefs[Keys.USE_SYSTEM_FONT_SCALE] ?: true
+        val fontScalePercent = (prefs[Keys.FONT_SCALE_PERCENT] ?: 100).coerceIn(80, 140)
         val bottomBarStyle = enumOrDefault(prefs[Keys.BOTTOM_BAR_STYLE], BottomBarStyle.PINNED)
         val liquidGlassLevel = enumOrDefault(prefs[Keys.LIQUID_GLASS_LEVEL], LiquidGlassLevel.NONE)
         val currency = CurrencyOption.fromCode(prefs[Keys.DEFAULT_CURRENCY]).code
@@ -61,6 +66,8 @@ class SettingsRepository(private val context: Context) {
             accentColorArgb = accentColorArgb,
             customAccentColors = customColors,
             appFont = appFont,
+            useSystemFontScale = useSystemFontScale,
+            fontScalePercent = fontScalePercent,
             bottomBarStyle = bottomBarStyle,
             liquidGlassLevel = liquidGlassLevel,
             defaultCurrencyCode = currency,
@@ -132,6 +139,18 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    suspend fun setUseSystemFontScale(enabled: Boolean) {
+        context.settingsDataStore.edit { prefs ->
+            prefs[Keys.USE_SYSTEM_FONT_SCALE] = enabled
+        }
+    }
+
+    suspend fun setFontScalePercent(percent: Int) {
+        context.settingsDataStore.edit { prefs ->
+            prefs[Keys.FONT_SCALE_PERCENT] = percent.coerceIn(80, 140)
+        }
+    }
+
     suspend fun setBottomBarStyle(style: BottomBarStyle) {
         context.settingsDataStore.edit { prefs ->
             prefs[Keys.BOTTOM_BAR_STYLE] = style.name
@@ -172,6 +191,8 @@ class SettingsRepository(private val context: Context) {
                 imported.customAccentColors.map(BaseAccentColor::normalizeOpaqueArgb).distinct()
             )
             prefs[Keys.APP_FONT] = imported.appFont.name
+            prefs[Keys.USE_SYSTEM_FONT_SCALE] = imported.useSystemFontScale
+            prefs[Keys.FONT_SCALE_PERCENT] = imported.fontScalePercent.coerceIn(80, 140)
             prefs[Keys.BOTTOM_BAR_STYLE] = imported.bottomBarStyle.name
             prefs[Keys.LIQUID_GLASS_LEVEL] = imported.liquidGlassLevel.name
             prefs[Keys.DEFAULT_CURRENCY] = CurrencyOption.fromCode(imported.defaultCurrencyCode).code

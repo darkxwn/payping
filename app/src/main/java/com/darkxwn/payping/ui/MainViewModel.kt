@@ -207,6 +207,18 @@ class PayPingViewModel(
         }
     }
 
+    fun setUseSystemFontScale(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setUseSystemFontScale(enabled)
+        }
+    }
+
+    fun setFontScalePercent(percent: Int) {
+        viewModelScope.launch {
+            settingsRepository.setFontScalePercent(percent)
+        }
+    }
+
     fun setBottomBarStyle(style: BottomBarStyle) {
         viewModelScope.launch {
             settingsRepository.setBottomBarStyle(style)

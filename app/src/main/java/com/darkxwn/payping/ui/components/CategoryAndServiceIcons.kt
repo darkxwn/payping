@@ -16,6 +16,7 @@ import androidx.compose.material.icons.rounded.Category
 import androidx.compose.material.icons.rounded.Checkroom
 import androidx.compose.material.icons.rounded.ChildCare
 import androidx.compose.material.icons.rounded.Cloud
+import androidx.compose.material.icons.rounded.ConfirmationNumber
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.Favorite
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.rounded.LocalShipping
 import androidx.compose.material.icons.rounded.MedicalServices
 import androidx.compose.material.icons.rounded.MenuBook
 import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Pets
 import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.Restaurant
@@ -105,6 +107,8 @@ fun categoryIconFor(iconKey: String): ImageVector = when (iconKey) {
     "parking" -> Icons.Rounded.LocalParking
     "delivery" -> Icons.Rounded.LocalShipping
     "photo" -> Icons.Rounded.PhotoCamera
+    "ticket" -> Icons.Rounded.ConfirmationNumber
+    "design" -> Icons.Rounded.Palette
     else -> Icons.Rounded.Category
 }
 

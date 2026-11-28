@@ -94,11 +94,15 @@ object CategoryCatalog {
         "parking",
         "delivery",
         "photo",
+        "ticket",
+        "design",
         "other"
     )
 
     val CATEGORY_COLORS: List<Long> = listOf(
         0xFF0E7C66L,
+        0xFF00838FL,
+        0xFF0288D1L,
         0xFF1565C0L,
         0xFF4F46E5L,
         0xFF6A1B9AL,

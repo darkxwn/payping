@@ -362,6 +362,8 @@ fun PayPingAppScreen(
                                     onAddCustomAccentColor = { viewModel.addCustomAccentColor(it) },
                                     onRemoveCustomAccentColor = { viewModel.removeCustomAccentColor(it) },
                                     onAppFontChange = { viewModel.setAppFont(it) },
+                                    onUseSystemFontScaleChange = { viewModel.setUseSystemFontScale(it) },
+                                    onFontScalePercentChange = { viewModel.setFontScalePercent(it) },
                                     onBottomBarStyleChange = { viewModel.setBottomBarStyle(it) },
                                     onLiquidGlassLevelChange = { viewModel.setLiquidGlassLevel(it) },
                                     onNavigateBack = { navController.popBackStack() }

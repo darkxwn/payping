@@ -146,6 +146,8 @@ data class AppSettings(
     val accentColorArgb: Long = BaseAccentColor.DEFAULT_ARGB,
     val customAccentColors: List<Long> = emptyList(),
     val appFont: AppFont = AppFont.SYSTEM,
+    val useSystemFontScale: Boolean = true,
+    val fontScalePercent: Int = 100,
     val bottomBarStyle: BottomBarStyle = BottomBarStyle.PINNED,
     val liquidGlassLevel: LiquidGlassLevel = LiquidGlassLevel.NONE,
     val defaultCurrencyCode: String = CurrencyOption.RUB.code,

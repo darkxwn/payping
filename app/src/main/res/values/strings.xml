@@ -98,6 +98,10 @@
     <string name="font_roboto">Roboto</string>
     <string name="font_inter">Inter</string>
     <string name="font_consolas">Consolas</string>
+    <string name="theme_section_font_scale">Text scale</string>
+    <string name="font_scale_system">System default</string>
+    <string name="font_scale_custom">Custom</string>
+    <string name="font_scale_size_label">Size</string>
     <string name="color_picker_title">Custom color</string>
     <string name="color_picker_hex_label">HEX color</string>
     <string name="color_picker_add">Add</string>

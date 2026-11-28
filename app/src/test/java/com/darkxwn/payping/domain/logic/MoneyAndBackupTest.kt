@@ -111,6 +111,8 @@ class MoneyAndBackupTest {
             accentColorArgb = 0xFF4F46E5L,
             customAccentColors = listOf(0xFF4F46E5L, 0xFF00BCD4L),
             appFont = AppFont.CONSOLAS,
+            useSystemFontScale = false,
+            fontScalePercent = 120,
             bottomBarStyle = BottomBarStyle.FLOATING,
             liquidGlassLevel = LiquidGlassLevel.MAXIMUM,
             defaultCurrencyCode = "EUR",
@@ -178,6 +180,8 @@ class MoneyAndBackupTest {
         assertEquals(AppFont.SYSTEM, settings.appFont)
         assertEquals(BottomBarStyle.PINNED, settings.bottomBarStyle)
         assertEquals(LiquidGlassLevel.NONE, settings.liquidGlassLevel)
+        assertTrue(settings.useSystemFontScale)
+        assertEquals(100, settings.fontScalePercent)
     }
 
     @Test
