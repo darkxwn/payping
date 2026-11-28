@@ -59,6 +59,7 @@ import com.darkxwn.payping.domain.model.AppSettings
 import com.darkxwn.payping.domain.model.AppThemeMode
 import com.darkxwn.payping.domain.model.BaseAccentColor
 import com.darkxwn.payping.domain.model.BottomBarStyle
+import com.darkxwn.payping.domain.model.FontScaleRange
 import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import com.darkxwn.payping.ui.components.ColorPickerDialog
 import com.darkxwn.payping.ui.components.PayPingSubmenuScreen
@@ -270,9 +271,12 @@ fun ThemeSettingsScreen(
 
             ExternalSectionTitle(stringResource(R.string.theme_section_font_scale))
             ThemeOptionCard {
+                val minScale = FontScaleRange.MIN_PERCENT.toFloat()
+                val maxScale = FontScaleRange.MAX_PERCENT.toFloat()
+                val stepSize = FontScaleRange.STEP_PERCENT
                 val systemPercent = (LocalDensity.current.fontScale * 100f).roundToInt()
                 var sliderPercent by remember(settings.fontScalePercent) {
-                    mutableFloatStateOf(settings.fontScalePercent.coerceIn(80, 140).toFloat())
+                    mutableFloatStateOf(FontScaleRange.clamp(settings.fontScalePercent).toFloat())
                 }
                 val displayedPercent = if (settings.useSystemFontScale) {
                     systemPercent
@@ -333,23 +337,25 @@ fun ThemeSettingsScreen(
 
                         Slider(
                             value = if (settings.useSystemFontScale) {
-                                systemPercent.toFloat().coerceIn(80f, 140f)
+                                FontScaleRange.clamp(systemPercent).toFloat()
                             } else {
-                                sliderPercent.coerceIn(80f, 140f)
+                                FontScaleRange.clamp(sliderPercent.roundToInt()).toFloat()
                             },
                             onValueChange = { raw ->
-                                val snapped = (((raw - 80f) / 5f).roundToInt() * 5 + 80).coerceIn(80, 140)
+                                val snapped = FontScaleRange.clamp(
+                                    ((raw - minScale) / stepSize).roundToInt() * stepSize + FontScaleRange.MIN_PERCENT
+                                )
                                 sliderPercent = snapped.toFloat()
                             },
                             onValueChangeFinished = {
-                                val target = sliderPercent.roundToInt().coerceIn(80, 140)
+                                val target = FontScaleRange.clamp(sliderPercent.roundToInt())
                                 if (target != settings.fontScalePercent) {
                                     onFontScalePercentChange(target)
                                 }
                             },
                             enabled = !settings.useSystemFontScale,
-                            valueRange = 80f..140f,
-                            steps = 11,
+                            valueRange = minScale..maxScale,
+                            steps = 7,
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -358,17 +364,12 @@ fun ThemeSettingsScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "80%",
+                                text = "${FontScaleRange.MIN_PERCENT}%",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "110%",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = "140%",
+                                text = "${FontScaleRange.MAX_PERCENT}%",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -423,7 +424,7 @@ fun ThemeSettingsScreen(
                                 maxLines = 1,
                                 softWrap = false,
                                 overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.labelLarge
                             )
                         }
                     }

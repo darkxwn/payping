@@ -17,6 +17,7 @@ import com.darkxwn.payping.domain.model.BaseAccentColor
 import com.darkxwn.payping.domain.model.BottomBarStyle
 import com.darkxwn.payping.domain.model.CurrencyCatalog
 import com.darkxwn.payping.domain.model.CurrencyOption
+import com.darkxwn.payping.domain.model.FontScaleRange
 import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -52,7 +53,7 @@ class SettingsRepository(private val context: Context) {
         val customColors = decodeCustomColors(prefs[Keys.CUSTOM_ACCENT_COLORS])
         val appFont = enumOrDefault(prefs[Keys.APP_FONT], AppFont.SYSTEM)
         val useSystemFontScale = prefs[Keys.USE_SYSTEM_FONT_SCALE] ?: true
-        val fontScalePercent = (prefs[Keys.FONT_SCALE_PERCENT] ?: 100).coerceIn(80, 140)
+        val fontScalePercent = (prefs[Keys.FONT_SCALE_PERCENT] ?: 100).coerceIn(FontScaleRange.MIN_PERCENT, FontScaleRange.MAX_PERCENT)
         val bottomBarStyle = enumOrDefault(prefs[Keys.BOTTOM_BAR_STYLE], BottomBarStyle.PINNED)
         val liquidGlassLevel = enumOrDefault(prefs[Keys.LIQUID_GLASS_LEVEL], LiquidGlassLevel.NONE)
         val currency = CurrencyOption.fromCode(prefs[Keys.DEFAULT_CURRENCY]).code
@@ -147,7 +148,7 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setFontScalePercent(percent: Int) {
         context.settingsDataStore.edit { prefs ->
-            prefs[Keys.FONT_SCALE_PERCENT] = percent.coerceIn(80, 140)
+            prefs[Keys.FONT_SCALE_PERCENT] = percent.coerceIn(FontScaleRange.MIN_PERCENT, FontScaleRange.MAX_PERCENT)
         }
     }
 
@@ -192,7 +193,7 @@ class SettingsRepository(private val context: Context) {
             )
             prefs[Keys.APP_FONT] = imported.appFont.name
             prefs[Keys.USE_SYSTEM_FONT_SCALE] = imported.useSystemFontScale
-            prefs[Keys.FONT_SCALE_PERCENT] = imported.fontScalePercent.coerceIn(80, 140)
+            prefs[Keys.FONT_SCALE_PERCENT] = imported.fontScalePercent.coerceIn(FontScaleRange.MIN_PERCENT, FontScaleRange.MAX_PERCENT)
             prefs[Keys.BOTTOM_BAR_STYLE] = imported.bottomBarStyle.name
             prefs[Keys.LIQUID_GLASS_LEVEL] = imported.liquidGlassLevel.name
             prefs[Keys.DEFAULT_CURRENCY] = CurrencyOption.fromCode(imported.defaultCurrencyCode).code

@@ -9,6 +9,7 @@ import com.darkxwn.payping.domain.model.BottomBarStyle
 import com.darkxwn.payping.domain.model.BuiltInCategory
 import com.darkxwn.payping.domain.model.CurrencyCatalog
 import com.darkxwn.payping.domain.model.CurrencyOption
+import com.darkxwn.payping.domain.model.FontScaleRange
 import com.darkxwn.payping.domain.model.LiquidGlassLevel
 import com.darkxwn.payping.domain.model.PaymentCategory
 import com.darkxwn.payping.domain.model.PaymentHistory
@@ -147,7 +148,7 @@ object BackupSerializer {
                 customAccentColors = settings.customAccentColors.map(BaseAccentColor::normalizeOpaqueArgb),
                 appFont = settings.appFont.name,
                 useSystemFontScale = settings.useSystemFontScale,
-                fontScalePercent = settings.fontScalePercent.coerceIn(80, 140),
+                fontScalePercent = settings.fontScalePercent.coerceIn(FontScaleRange.MIN_PERCENT, FontScaleRange.MAX_PERCENT),
                 bottomBarStyle = settings.bottomBarStyle.name,
                 liquidGlassLevel = settings.liquidGlassLevel.name,
                 defaultCurrencyCode = settings.defaultCurrencyCode,
@@ -237,7 +238,7 @@ object BackupSerializer {
                     .distinct(),
                 appFont = enumValueOrNull<AppFont>(dto.appFont) ?: AppFont.SYSTEM,
                 useSystemFontScale = dto.useSystemFontScale,
-                fontScalePercent = dto.fontScalePercent.coerceIn(80, 140),
+                fontScalePercent = dto.fontScalePercent.coerceIn(FontScaleRange.MIN_PERCENT, FontScaleRange.MAX_PERCENT),
                 bottomBarStyle = enumValueOrNull<BottomBarStyle>(dto.bottomBarStyle) ?: BottomBarStyle.PINNED,
                 liquidGlassLevel = enumValueOrNull<LiquidGlassLevel>(dto.liquidGlassLevel) ?: LiquidGlassLevel.NONE,
                 defaultCurrencyCode = CurrencyOption.fromCode(dto.defaultCurrencyCode).code,

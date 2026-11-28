@@ -138,6 +138,14 @@ data class PaymentHistory(
     val rateToUsd: Double? = null
 )
 
+object FontScaleRange {
+    const val MIN_PERCENT = 80
+    const val MAX_PERCENT = 120
+    const val STEP_PERCENT = 5
+
+    fun clamp(percent: Int): Int = percent.coerceIn(MIN_PERCENT, MAX_PERCENT)
+}
+
 data class AppSettings(
     val language: AppLanguage = AppLanguage.SYSTEM,
     val themeMode: AppThemeMode = AppThemeMode.SYSTEM,

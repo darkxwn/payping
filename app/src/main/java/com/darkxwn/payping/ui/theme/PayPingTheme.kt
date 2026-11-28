@@ -31,6 +31,7 @@ import com.darkxwn.payping.R
 import com.darkxwn.payping.domain.model.AppFont
 import com.darkxwn.payping.domain.model.AppThemeMode
 import com.darkxwn.payping.domain.model.BaseAccentColor
+import com.darkxwn.payping.domain.model.FontScaleRange
 
 private val PayPingShapes = Shapes(
     extraSmall = RoundedCornerShape(12.dp),
@@ -183,7 +184,7 @@ fun PayPingTheme(
     } else {
         Density(
             density = baseDensity.density,
-            fontScale = fontScalePercent.coerceIn(80, 140) / 100f
+            fontScale = fontScalePercent.coerceIn(FontScaleRange.MIN_PERCENT, FontScaleRange.MAX_PERCENT) / 100f
         )
     }
 

@@ -350,13 +350,6 @@ private fun HistoryCard(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    HistoryMetaBadge(
-                        icon = Icons.Rounded.CheckCircle,
-                        text = stringResource(
-                            R.string.history_paid_at,
-                            formatDateTimeMillis(item.paidAtEpochMillis, language)
-                        )
-                    )
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -373,6 +366,13 @@ private fun HistoryCard(
                             text = recurrenceLabel(item.recurrence)
                         )
                     }
+                    HistoryMetaBadge(
+                        icon = Icons.Rounded.CheckCircle,
+                        text = stringResource(
+                            R.string.history_paid_at,
+                            formatDateTimeMillis(item.paidAtEpochMillis, language)
+                        )
+                    )
                 }
 
                 IconButton(onClick = onDeleteClick) {
