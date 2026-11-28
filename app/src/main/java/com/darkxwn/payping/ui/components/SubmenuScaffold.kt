@@ -5,12 +5,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
@@ -35,7 +38,7 @@ import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 
 /**
- * Shared layout for Settings submenus with a circular back button that
+ * Shared layout for submenus with a circular back button that
  * stays inside a circle at all glass levels and refracts scrolling content in MAXIMUM mode.
  */
 @Composable
@@ -44,6 +47,8 @@ fun PayPingSubmenuScreen(
     liquidGlassLevel: LiquidGlassLevel,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {},
+    bottomBar: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val hazeState = rememberHazeState()
@@ -70,8 +75,9 @@ fun PayPingSubmenuScreen(
                         start = 16.dp,
                         end = 16.dp,
                         top = statusTop + 68.dp,
-                        bottom = navBottom + 24.dp
-                    ),
+                        bottom = navBottom + if (bottomBar != null) 96.dp else 24.dp
+                    )
+                    .let { base -> if (bottomBar == null) base.imePadding() else base },
                 content = content
             )
 
@@ -111,8 +117,32 @@ fun PayPingSubmenuScreen(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
+                    actions()
+                }
+            }
+
+            if (bottomBar != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.72f else 0.94f),
+                                    backgroundColor
+                                )
+                            )
+                        )
+                        .navigationBarsPadding()
+                        .imePadding()
+                        .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 12.dp)
+                ) {
+                    bottomBar()
                 }
             }
         }

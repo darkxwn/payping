@@ -1,0 +1,27 @@
+<!-- Source: LawnchairLauncher/lawnicons (avito.svg), Apache-2.0 License -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="192"
+    android:viewportHeight="192">
+    <path
+        android:pathData="M106,59a32,32 0 1,0 64,0a32,32 0 1,0 -64,0Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="12"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M22,123a42,42 0 1,0 84,0a42,42 0 1,0 -84,0Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="12"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M126,133a22,22 0 1,0 44,0a22,22 0 1,0 -44,0Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="12"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M57,46a15,15 0 1,0 30,0a15,15 0 1,0 -30,0Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="12"
+        android:strokeLineCap="round" />
+</vector>

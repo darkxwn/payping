@@ -286,18 +286,6 @@ private fun HistoryCard(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Surface(
-                        shape = MaterialTheme.shapes.small,
-                        color = Color(category.colorArgb).copy(alpha = 0.14f)
-                    ) {
-                        Text(
-                            text = category.name,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = categoryColor,
-                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
-                        )
-                    }
                     if (item.paymentType != PaymentType.MANUAL) {
                         Surface(
                             shape = MaterialTheme.shapes.small,
@@ -319,6 +307,18 @@ private fun HistoryCard(
                                 modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
                             )
                         }
+                    }
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        color = Color(category.colorArgb).copy(alpha = 0.14f)
+                    ) {
+                        Text(
+                            text = category.name,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = categoryColor,
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                        )
                     }
                 }
                 if (item.note.isNotBlank()) {

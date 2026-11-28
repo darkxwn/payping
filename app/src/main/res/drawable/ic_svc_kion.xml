@@ -1,0 +1,19 @@
+<!-- Source: LawnchairLauncher/lawnicons (kion.svg), Apache-2.0 License -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="192"
+    android:viewportHeight="192">
+    <path
+        android:pathData="M28 145h136a6 6 0 0 0 6-6V53a6 6 0 0 0-6-6H28a6 6 0 0 0-6 6v86a6 6 0 0 0 6 6Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="12"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M62 111h68a6 6 0 0 0 6-6V87a6 6 0 0 0-6-6H62a6 6 0 0 0-6 6v18a6 6 0 0 0 6 6Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="12"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

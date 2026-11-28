@@ -8,20 +8,15 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
@@ -39,7 +34,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -47,7 +41,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -61,7 +54,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -84,8 +76,8 @@ import com.darkxwn.payping.domain.model.RecurrenceType
 import com.darkxwn.payping.domain.model.ReminderConstants
 import com.darkxwn.payping.ui.components.CategoryBadgeAvatar
 import com.darkxwn.payping.ui.components.CategoryPickerSheet
-import com.darkxwn.payping.ui.components.CircularBackButton
 import com.darkxwn.payping.ui.components.CurrencyPickerSheet
+import com.darkxwn.payping.ui.components.PayPingSubmenuScreen
 import com.darkxwn.payping.ui.components.PaymentBadgeAvatar
 import com.darkxwn.payping.ui.components.ServiceBadgePickerSheet
 import com.darkxwn.payping.ui.components.formatLocalDate
@@ -196,47 +188,76 @@ fun ReminderEditScreen(
             .sorted()
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(
-                            if (isEditMode) R.string.editor_title_edit else R.string.editor_title_new
-                        ),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                navigationIcon = {
-                    CircularBackButton(
-                        liquidGlassLevel = liquidGlassLevel,
-                        onClick = onNavigateBack,
-                        contentDescription = stringResource(R.string.action_cancel),
-                        modifier = Modifier.padding(start = 12.dp)
-                    )
-                },
-                actions = {
-                    if (isEditMode) {
-                        IconButton(onClick = { showDeleteConfirm = true }) {
-                            Icon(
-                                imageVector = Icons.Rounded.Delete,
-                                contentDescription = stringResource(R.string.action_delete),
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
-                }
+    fun attemptSave() {
+        val trimmedTitle = title.trim()
+        val parsedMinor = MoneyFormat.parseAmountToMinor(amountInput, currencyCode)
+        val validDays = selectedDays.isNotEmpty()
+
+        showTitleError = trimmedTitle.isEmpty()
+        showAmountError = parsedMinor == null
+        showDaysError = !validDays
+
+        if (trimmedTitle.isNotEmpty() && parsedMinor != null && validDays) {
+            onSave(
+                PaymentReminder(
+                    id = if (isEditMode) reminderId else 0L,
+                    uid = reminderUid,
+                    title = trimmedTitle,
+                    amountMinor = parsedMinor,
+                    currencyCode = currencyCode,
+                    dueDate = dueDate,
+                    notifyHour = notifyHour,
+                    notifyMinute = notifyMinute,
+                    recurrence = recurrence,
+                    remindDaysBefore = selectedDays.sorted(),
+                    note = note.trim(),
+                    paymentType = paymentType,
+                    categoryUid = categoryUid,
+                    badgeIconKey = badgeIconKey,
+                    badgeText = badgeText,
+                    badgeColorArgb = badgeColorArgb,
+                    isArchived = isArchived,
+                    isVariableAmount = isVariableAmount,
+                    serviceLink = serviceLink,
+                    anchorDayOfMonth = dueDate.dayOfMonth,
+                    createdAtEpochMillis = createdAtMillis
+                )
             )
         }
-    ) { innerPadding ->
+    }
+
+    PayPingSubmenuScreen(
+        title = stringResource(if (isEditMode) R.string.editor_title_edit else R.string.editor_title_new),
+        liquidGlassLevel = liquidGlassLevel,
+        onNavigateBack = onNavigateBack,
+        modifier = modifier,
+        actions = {
+            if (isEditMode) {
+                IconButton(onClick = { showDeleteConfirm = true }) {
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = stringResource(R.string.action_delete),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        },
+        bottomBar = {
+            Button(
+                onClick = { attemptSave() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.action_save),
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .imePadding()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Row(
@@ -539,56 +560,6 @@ fun ReminderEditScreen(
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Button(
-                onClick = {
-                    val trimmedTitle = title.trim()
-                    val parsedMinor = MoneyFormat.parseAmountToMinor(amountInput, currencyCode)
-                    val validDays = selectedDays.isNotEmpty()
-
-                    showTitleError = trimmedTitle.isEmpty()
-                    showAmountError = parsedMinor == null
-                    showDaysError = !validDays
-
-                    if (trimmedTitle.isNotEmpty() && parsedMinor != null && validDays) {
-                        onSave(
-                            PaymentReminder(
-                                id = if (isEditMode) reminderId else 0L,
-                                uid = reminderUid,
-                                title = trimmedTitle,
-                                amountMinor = parsedMinor,
-                                currencyCode = currencyCode,
-                                dueDate = dueDate,
-                                notifyHour = notifyHour,
-                                notifyMinute = notifyMinute,
-                                recurrence = recurrence,
-                                remindDaysBefore = selectedDays.sorted(),
-                                note = note.trim(),
-                                paymentType = paymentType,
-                                categoryUid = categoryUid,
-                                badgeIconKey = badgeIconKey,
-                                badgeText = badgeText,
-                                badgeColorArgb = badgeColorArgb,
-                                isArchived = isArchived,
-                                isVariableAmount = isVariableAmount,
-                                serviceLink = serviceLink,
-                                anchorDayOfMonth = dueDate.dayOfMonth,
-                                createdAtEpochMillis = createdAtMillis
-                            )
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.action_save),
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
         }
     }
 

@@ -516,6 +516,49 @@ private fun ReminderCard(
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        val typeBg = when (reminder.paymentType) {
+                            PaymentType.TRIAL -> MaterialTheme.colorScheme.tertiaryContainer
+                            PaymentType.AUTO_DEBIT -> MaterialTheme.colorScheme.secondaryContainer
+                            else -> MaterialTheme.colorScheme.surfaceContainerHighest
+                        }
+                        val typeFg = when (reminder.paymentType) {
+                            PaymentType.TRIAL -> MaterialTheme.colorScheme.onTertiaryContainer
+                            PaymentType.AUTO_DEBIT -> MaterialTheme.colorScheme.onSecondaryContainer
+                            else -> MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                        Surface(
+                            shape = MaterialTheme.shapes.small,
+                            color = typeBg
+                        ) {
+                            Text(
+                                text = paymentTypeLabel(reminder.paymentType),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = typeFg,
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                            )
+                        }
+
+                        Surface(
+                            shape = MaterialTheme.shapes.small,
+                            color = Color(category.colorArgb).copy(alpha = 0.14f)
+                        ) {
+                            Text(
+                                text = category.name,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = categoryColor,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
+
+                    FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
@@ -542,44 +585,6 @@ private fun ReminderCard(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Surface(
-                            shape = MaterialTheme.shapes.small,
-                            color = Color(category.colorArgb).copy(alpha = 0.14f)
-                        ) {
-                            Text(
-                                text = category.name,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = categoryColor,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
-                            )
-                        }
-
-                        if (reminder.paymentType != PaymentType.MANUAL) {
-                            val typeBg = when (reminder.paymentType) {
-                                PaymentType.TRIAL -> MaterialTheme.colorScheme.tertiaryContainer
-                                else -> MaterialTheme.colorScheme.secondaryContainer
-                            }
-                            val typeFg = when (reminder.paymentType) {
-                                PaymentType.TRIAL -> MaterialTheme.colorScheme.onTertiaryContainer
-                                else -> MaterialTheme.colorScheme.onSecondaryContainer
-                            }
-                            Surface(
-                                shape = MaterialTheme.shapes.small,
-                                color = typeBg
-                            ) {
-                                Text(
-                                    text = paymentTypeLabel(reminder.paymentType),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = typeFg,
-                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
-                                )
-                            }
-                        }
-
                         reminder.remindDaysBefore.forEach { daysBefore ->
                             Surface(
                                 shape = MaterialTheme.shapes.small,

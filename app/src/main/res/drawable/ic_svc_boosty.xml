@@ -1,0 +1,13 @@
+<!-- Source: LawnchairLauncher/lawnicons (boosty.svg), Apache-2.0 License -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="192"
+    android:viewportHeight="192">
+    <path
+        android:pathData="M95 57.01c2.308.074 16.75.556 25.164 1.302 28.98 3.13 42.565 26.695 34.577 55.189C146.166 144.159 110.804 170 77 170c-34.69-.4-44.616-26.092-36.1-56.492L66.518 22h37.949L79 111.501h32L72.581 169"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="12"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

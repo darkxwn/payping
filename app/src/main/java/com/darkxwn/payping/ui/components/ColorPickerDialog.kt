@@ -50,7 +50,8 @@ import com.darkxwn.payping.domain.model.BaseAccentColor
 fun ColorPickerDialog(
     initialColorArgb: Long,
     onDismiss: () -> Unit,
-    onConfirm: (Long) -> Unit
+    onConfirm: (Long) -> Unit,
+    confirmTextRes: Int = R.string.color_picker_add
 ) {
     val initialHsv = remember(initialColorArgb) {
         FloatArray(3).apply {
@@ -166,7 +167,7 @@ fun ColorPickerDialog(
                 onClick = { parsedHexArgb?.let(onConfirm) },
                 enabled = parsedHexArgb != null
             ) {
-                Text(stringResource(R.string.color_picker_add))
+                Text(stringResource(confirmTextRes))
             }
         },
         dismissButton = {

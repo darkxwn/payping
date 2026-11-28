@@ -267,6 +267,11 @@ fun CategoryEditorDialog(
     }
     var showNameError by remember { mutableStateOf(false) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    var showCustomColorPicker by remember { mutableStateOf(false) }
+
+    val colorChoices = remember(colorArgb) {
+        (CategoryCatalog.CATEGORY_COLORS + colorArgb).distinct()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -372,13 +377,14 @@ fun CategoryEditorDialog(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    CategoryCatalog.CATEGORY_COLORS.forEach { argb ->
+                    colorChoices.forEach { argb ->
                         ColorCircleOption(
                             argb = argb,
                             selected = colorArgb == argb,
                             onClick = { colorArgb = argb }
                         )
                     }
+                    AddCustomColorOption(onClick = { showCustomColorPicker = true })
                 }
             }
         },
@@ -414,6 +420,18 @@ fun CategoryEditorDialog(
             }
         }
     )
+
+    if (showCustomColorPicker) {
+        ColorPickerDialog(
+            initialColorArgb = colorArgb,
+            onDismiss = { showCustomColorPicker = false },
+            onConfirm = { picked ->
+                colorArgb = picked
+                showCustomColorPicker = false
+            },
+            confirmTextRes = R.string.action_confirm
+        )
+    }
 
     if (showDeleteConfirm && existingCategory != null && onDelete != null) {
         AlertDialog(
@@ -462,18 +480,20 @@ fun ServiceBadgePickerSheet(
     var customText by remember { mutableStateOf(initialText ?: "") }
     var selectedColorArgb by remember { mutableLongStateOf(initialColorArgb) }
     var serviceSearch by remember { mutableStateOf("") }
+    var showCustomColorPicker by remember { mutableStateOf(false) }
 
     val filteredPresets = remember(serviceSearch) {
         ServiceBadgeCatalog.presets.filter { it.matchesQuery(serviceSearch) }
     }
 
-    val badgeColorChoices = remember {
+    val badgeColorChoices = remember(selectedColorArgb) {
         (CategoryCatalog.CATEGORY_COLORS + listOf(
             0xFF21A038L,
             0xFFFFDD2DL,
             0xFF229ED9L,
             0xFFFF5500L,
-            0xFF1F2229L
+            0xFF1F2229L,
+            selectedColorArgb
         )).distinct()
     }
 
@@ -637,6 +657,7 @@ fun ServiceBadgePickerSheet(
                             onClick = { selectedColorArgb = argb }
                         )
                     }
+                    AddCustomColorOption(onClick = { showCustomColorPicker = true })
                 }
             }
 
@@ -657,6 +678,40 @@ fun ServiceBadgePickerSheet(
                 )
             }
         }
+    }
+
+    if (showCustomColorPicker) {
+        ColorPickerDialog(
+            initialColorArgb = selectedColorArgb,
+            onDismiss = { showCustomColorPicker = false },
+            onConfirm = { picked ->
+                selectedColorArgb = picked
+                showCustomColorPicker = false
+            },
+            confirmTextRes = R.string.action_confirm
+        )
+    }
+}
+
+@Composable
+private fun AddCustomColorOption(
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(34.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+            .clickable(role = Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Add,
+            contentDescription = stringResource(R.string.color_picker_title),
+            tint = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.size(18.dp)
+        )
     }
 }
 
