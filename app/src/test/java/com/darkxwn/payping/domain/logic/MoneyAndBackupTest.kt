@@ -143,7 +143,9 @@ class MoneyAndBackupTest {
     fun badgesAndCategories_handleMonogramsEmojiAndFallback() {
         assertEquals("ЯП", ServiceBadgeCatalog.deriveMonogram("Яндекс Плюс", null))
         assertEquals("TE", ServiceBadgeCatalog.deriveMonogram("Telegram", null))
-        assertEquals("🎬", ServiceBadgeCatalog.deriveMonogram("Cinema", "🎬🎵"))
+        assertEquals("🎬", ServiceBadgeCatalog.deriveMonogram("Cinema", "🎬"))
+        assertEquals("🎬🎵", ServiceBadgeCatalog.deriveMonogram("Cinema", "🎬🎵🎮"))
+        assertEquals("🎬К", ServiceBadgeCatalog.deriveMonogram("🎬 Кино", null))
         assertEquals(BuiltInCategory.SUBSCRIPTIONS.uid, CategoryCatalog.resolve("cat_subscriptions", emptyList(), "ru").uid)
         assertEquals(BuiltInCategory.OTHER.uid, CategoryCatalog.resolve("non_existent", emptyList(), "ru").uid)
     }
