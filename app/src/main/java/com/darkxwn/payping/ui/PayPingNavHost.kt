@@ -452,7 +452,7 @@ fun PayPingAppScreen(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .navigationBarsPadding()
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                        .padding(horizontal = 10.dp, vertical = 12.dp)
                 )
             }
         }
@@ -503,8 +503,8 @@ private fun FloatingLiquidBottomBar(
     val pillShape = RoundedCornerShape(28.dp)
     val activeIndicatorAlpha = when (liquidGlassLevel) {
         LiquidGlassLevel.NONE -> 1f
-        LiquidGlassLevel.STANDARD -> 0.72f
-        LiquidGlassLevel.MAXIMUM -> 0.30f
+        LiquidGlassLevel.STANDARD -> 0.50f
+        LiquidGlassLevel.MAXIMUM -> 0.20f
     }
 
     LiquidGlassContainer(
@@ -516,7 +516,7 @@ private fun FloatingLiquidBottomBar(
         refractionDp = 12.dp,
         dispersionDp = 2.2.dp,
         modifier = modifier
-            .widthIn(max = 420.dp)
+            .widthIn(max = 460.dp)
             .fillMaxWidth()
     ) {
         Row(

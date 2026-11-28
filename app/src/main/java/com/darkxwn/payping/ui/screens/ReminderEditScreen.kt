@@ -30,7 +30,6 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
@@ -76,6 +75,7 @@ import com.darkxwn.payping.domain.model.RecurrenceType
 import com.darkxwn.payping.domain.model.ReminderConstants
 import com.darkxwn.payping.ui.components.CategoryBadgeAvatar
 import com.darkxwn.payping.ui.components.CategoryPickerSheet
+import com.darkxwn.payping.ui.components.CircularGlassIconButton
 import com.darkxwn.payping.ui.components.CurrencyPickerSheet
 import com.darkxwn.payping.ui.components.PayPingSubmenuScreen
 import com.darkxwn.payping.ui.components.PaymentBadgeAvatar
@@ -233,13 +233,14 @@ fun ReminderEditScreen(
         modifier = modifier,
         actions = {
             if (isEditMode) {
-                IconButton(onClick = { showDeleteConfirm = true }) {
-                    Icon(
-                        imageVector = Icons.Rounded.Delete,
-                        contentDescription = stringResource(R.string.action_delete),
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
+                Spacer(modifier = Modifier.width(8.dp))
+                CircularGlassIconButton(
+                    icon = Icons.Rounded.Delete,
+                    liquidGlassLevel = liquidGlassLevel,
+                    onClick = { showDeleteConfirm = true },
+                    contentDescription = stringResource(R.string.action_delete),
+                    tint = MaterialTheme.colorScheme.error
+                )
             }
         },
         bottomBar = {

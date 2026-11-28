@@ -110,7 +110,7 @@
     <string name="theme_bar_floating">Плавающая</string>
     <string name="theme_section_liquid_glass">Жидкое стекло</string>
     <string name="theme_glass_none">Нет</string>
-    <string name="theme_glass_standard">Стандартный</string>
+    <string name="theme_glass_standard">Обычный</string>
     <string name="theme_glass_maximum">Максимум</string>
     <string name="settings_default_currency">Валюта по умолчанию</string>
 

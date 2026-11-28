@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
@@ -124,21 +125,21 @@ fun LiquidGlassContainer(
 
     val isMaximum = liquidGlassLevel == LiquidGlassLevel.MAXIMUM
     val tintColor = if (isMaximum) {
-        if (isDark) solidColor.copy(alpha = 0.08f) else Color.White.copy(alpha = 0.07f)
+        if (isDark) solidColor.copy(alpha = 0.03f) else Color.White.copy(alpha = 0.03f)
     } else {
-        if (isDark) solidColor.copy(alpha = 0.56f) else Color.White.copy(alpha = 0.62f)
+        if (isDark) solidColor.copy(alpha = 0.28f) else Color.White.copy(alpha = 0.30f)
     }
     val fallbackColor = if (isMaximum) {
-        if (isDark) solidColor.copy(alpha = 0.45f) else Color.White.copy(alpha = 0.48f)
+        if (isDark) solidColor.copy(alpha = 0.28f) else Color.White.copy(alpha = 0.30f)
     } else {
-        if (isDark) solidColor.copy(alpha = 0.88f) else solidColor.copy(alpha = 0.90f)
+        if (isDark) solidColor.copy(alpha = 0.68f) else solidColor.copy(alpha = 0.72f)
     }
 
     val hazeStyle = HazeStyle(
         backgroundColor = Color.Transparent,
         tints = listOf(HazeTint(tintColor)),
-        blurRadius = if (isMaximum) 9.dp else 20.dp,
-        noiseFactor = if (isMaximum) 0.02f else 0.04f,
+        blurRadius = if (isMaximum) 5.dp else 15.dp,
+        noiseFactor = if (isMaximum) 0.01f else 0.03f,
         fallbackTint = HazeTint(fallbackColor)
     )
 
@@ -243,13 +244,15 @@ fun LiquidGlassContainer(
 }
 
 @Composable
-fun CircularBackButton(
+fun CircularGlassIconButton(
+    icon: ImageVector,
     liquidGlassLevel: LiquidGlassLevel,
     onClick: () -> Unit,
     contentDescription: String,
     modifier: Modifier = Modifier,
     hazeState: HazeState? = LocalHazeState.current,
-    tint: Color = MaterialTheme.colorScheme.onSurface
+    tint: Color = MaterialTheme.colorScheme.onSurface,
+    iconSize: Dp = 20.dp
 ) {
     val effectiveGlass = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) {
         LiquidGlassLevel.MAXIMUM
@@ -276,13 +279,33 @@ fun CircularBackButton(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                imageVector = icon,
                 contentDescription = contentDescription,
                 tint = tint,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(iconSize)
             )
         }
     }
+}
+
+@Composable
+fun CircularBackButton(
+    liquidGlassLevel: LiquidGlassLevel,
+    onClick: () -> Unit,
+    contentDescription: String,
+    modifier: Modifier = Modifier,
+    hazeState: HazeState? = LocalHazeState.current,
+    tint: Color = MaterialTheme.colorScheme.onSurface
+) {
+    CircularGlassIconButton(
+        icon = Icons.AutoMirrored.Rounded.ArrowBack,
+        liquidGlassLevel = liquidGlassLevel,
+        onClick = onClick,
+        contentDescription = contentDescription,
+        modifier = modifier,
+        hazeState = hazeState,
+        tint = tint
+    )
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)

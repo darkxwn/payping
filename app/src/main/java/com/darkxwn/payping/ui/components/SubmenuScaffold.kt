@@ -87,8 +87,8 @@ fun PayPingSubmenuScreen(
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
-                                backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.48f else 0.96f),
-                                backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.16f else 0.78f),
+                                backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.28f else 0.96f),
+                                backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.08f else 0.78f),
                                 Color.Transparent
                             )
                         )
@@ -133,7 +133,7 @@ fun PayPingSubmenuScreen(
                             Brush.verticalGradient(
                                 colors = listOf(
                                     Color.Transparent,
-                                    backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.72f else 0.94f),
+                                    backgroundColor.copy(alpha = if (liquidGlassLevel == LiquidGlassLevel.MAXIMUM) 0.48f else 0.94f),
                                     backgroundColor
                                 )
                             )

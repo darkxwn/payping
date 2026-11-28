@@ -204,12 +204,18 @@ jobs:
           IS_DISPATCH="${{ steps.version.outputs.is_dispatch }}"
           CREATE_RELEASE="${{ inputs.create_release }}"
 
+          PRERELEASE_FLAG=""
+          if [[ "$VERSION_NAME" == *-* ]]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
             echo "Updating existing release $TAG_NAME with fresh APKs..."
             gh release upload "$TAG_NAME" dist/*.apk --clobber
           elif [[ "$IS_TAG" == "true" || ( "$IS_DISPATCH" == "true" && "$CREATE_RELEASE" == "true" ) ]]; then
             echo "Creating new release $TAG_NAME..."
             gh release create "$TAG_NAME" dist/*.apk \
+              ${PRERELEASE_FLAG} \
               --title "PayPing $TAG_NAME" \
               --generate-notes
           else
